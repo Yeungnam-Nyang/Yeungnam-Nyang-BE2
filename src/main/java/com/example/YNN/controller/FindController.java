@@ -38,9 +38,11 @@ public class FindController {
     public ResponseEntity<Map<String,String>> findUserId(@RequestBody FindIdDTO findIdDTO){
         try {
             String userId=findService.findId(findIdDTO);
+            String userName=findIdDTO.getStudentName();
             //제이슨 형태로 리턴
             Map<String,String> response=new HashMap<>();
             response.put("userId",userId);
+            response.put("userName",userName);
             return ResponseEntity.ok(response);
 
             //존재하지 않는 회원인 경우
