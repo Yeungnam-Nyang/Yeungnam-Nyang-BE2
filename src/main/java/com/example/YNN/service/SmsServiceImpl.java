@@ -1,13 +1,19 @@
 package com.example.YNN.service;
+import com.example.YNN.DTO.FindPasswordDTO;
 import com.example.YNN.DTO.SmsCertificationDTO;
+import com.example.YNN.Enums.SecurityQuestion;
+import com.example.YNN.model.User;
 import com.example.YNN.repository.SmsCertificationDao;
+import com.example.YNN.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import net.nurigo.java_sdk.api.Message;
 import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -18,6 +24,8 @@ import java.util.Random;
 public class SmsServiceImpl implements SmsService{
     //인증 번호를 Redis에 저장하기 위해 생성
     private final SmsCertificationDao smsCertificationDao;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
     @Value("${coolsms.api.key}")
@@ -68,6 +76,49 @@ public class SmsServiceImpl implements SmsService{
 
     }
 
+    //임시 비밀번호 재전송
+    @Transactional
+    public void sendNewPassword (FindPasswordDTO findPasswordDTO) throws CoolsmsException{
+       try {
+           //임시 8자리 비밀번호 생성
+           String newPassword=makeNewPassword(8);
+           Message msg=new Message(apiKey,apiSecret);
+
+           //유저 찾기
+           User user=userRepository.findByUserId(findPasswordDTO.getUserId());
+
+
+           //유저의 보안 질문과 일치하느가
+           SecurityQuestion userQuestion = SecurityQuestion.fromString(findPasswordDTO.getUserQuestion());
+        // 질문 및 답변이 일치하는지 확인
+           if (!userQuestion.equals(user.getUserQuestion()) || !user.getUserAnswer().equals(findPasswordDTO.getUserAnswer())) {
+               throw new IllegalStateException("보안 질문 또는 답변이 일치하지 않습니다.");
+           }
+
+           //유저 핸드폰 번호 찾기
+           String to=user.getUserPhoneNumber();
+
+           HashMap<String ,String> params=new HashMap<>();
+           params.put("to",to);
+           params.put("from",fromPhoneNumber);
+           params.put("type","sms");
+           params.put("text","[영남냥]\n임시 비밀번호는 ["+newPassword+"]입니다.");
+
+           //전송
+           msg.send(params);
+
+           //비밀번호 변경//
+           //암호화
+           String bcNewPassword=bCryptPasswordEncoder.encode(newPassword);
+
+           user.setNewPassword(bcNewPassword);
+           userRepository.save(user);
+
+       }catch (CoolsmsException e){
+           throw  new CoolsmsException("Failed to send SMS",404);
+       }
+    }
+
 
     //==============================기능 메서드 ==============================
 
@@ -88,6 +139,22 @@ public class SmsServiceImpl implements SmsService{
                         .equals(smsCertificationDTO.getVerificationNumber())
         );
 
+    }
+
+    //랜덤한 임시 비밀번호 만들기
+    //SecureRandom 이용한 난수 생성
+    public String makeNewPassword(int len){
+        final String chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        SecureRandom rm=new SecureRandom();
+        StringBuffer sb=new StringBuffer();
+
+        for(int i=0;i< len;i++){
+            int index=rm.nextInt(chars.length());
+            sb.append(chars.charAt(index));
+        }
+
+        return sb.toString();
     }
 
 

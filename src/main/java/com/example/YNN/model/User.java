@@ -34,5 +34,9 @@ public class User {
     //대답
     private String userAnswer;
 
+    //비밀번호만 변경
+    public void setNewPassword(String newPassword){
+        this.userPassword=newPassword;
+    }
 
 }

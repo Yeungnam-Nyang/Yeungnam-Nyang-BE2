@@ -32,8 +32,4 @@ public class FindServiceImpl implements FindService{
         return user.getUserId();
     }
 
-    @Override
-    public String findPw(FindPasswordDTO findPasswordDTO) {
-        return null;
-    }
 }
