@@ -14,4 +14,7 @@ public interface PostService {
 
     //New Post 반환
     PostResponseDTO getNewPost(String token);
+
+    //인기 게시물 가져오기
+    PostResponseDTO getPopular(String token);
 }

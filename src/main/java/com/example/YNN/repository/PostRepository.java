@@ -13,4 +13,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     //최신 게시물 가져오기
     List<Post> findAllByOrderByCreatedAtDesc();
 
+    //좋아요 가장 많은 게시물 가져오기
+    List<Post>  findAllByOrderByLikeCntDesc();
+
 }

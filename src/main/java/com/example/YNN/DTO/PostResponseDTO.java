@@ -25,6 +25,11 @@ public class PostResponseDTO {
     //게시일
     private String postDate;
 
+    //좋아요 수
+    private Long likeCnt;
+
+    //댓글 수
+    private Long commentCnt;
     //사진
     private List<String> pictureUrl;
 

@@ -109,6 +109,8 @@ public class PostServiceImpl implements PostService{
         //DTO생성
         PostResponseDTO postResponseDTO= PostResponseDTO.builder()
                 .postDate(String.valueOf(newPost.getCreatedAt()))
+                .likeCnt(newPost.getLikeCnt())
+                .commentCnt(newPost.getCommentCnt())
                 .content(newPost.getContent())
                 .userId(userId)
                 .catName(newPost.getCatName())
@@ -118,6 +120,34 @@ public class PostServiceImpl implements PostService{
         //제이슨 형식 DTO리턴
         return postResponseDTO;
     }
+    //인기 게시물 가져오기
+    @Transactional
+    @Override
+    public PostResponseDTO getPopular(String token) {
+        //유저 아이디 가져오기
+        String userId=jwtUtil.getUserId(token);
+        List<Post> postList=postRepository.findAllByOrderByLikeCntDesc();
+        Post popularPost= postList.get(0);
 
+        //사진가져오기
+        List<Picture> pictures=postPictureRepository.findByPost_PostId(popularPost.getPostId());
+        List<String> pictureUrls=pictures.stream()
+                .map(Picture::getPictureUrl)
+                .toList();
+        //DTO생성
+        PostResponseDTO postResponseDTO= PostResponseDTO.builder()
+                .postDate(String.valueOf(popularPost.getCreatedAt()))
+                .content(popularPost.getContent())
+                .commentCnt(popularPost.getCommentCnt())
+                .likeCnt(popularPost.getLikeCnt())
+                .userId(userId)
+                .catName(popularPost.getCatName())
+                .pictureUrl(pictureUrls)
+                .build();
+
+        //제이슨 형식 DTO리턴
+        return postResponseDTO;
+
+    }
 
 }

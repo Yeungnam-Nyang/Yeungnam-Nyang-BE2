@@ -43,4 +43,16 @@ public class PostController {
             return ResponseEntity.badRequest().body(emptyResponse);
         }
     }
+
+    //인기 게시물 불러오가
+    @GetMapping("/api/post/popular")
+    ResponseEntity<PostResponseDTO> getPopularPost(@RequestHeader("Authorization") String token){
+        try {
+            PostResponseDTO postResponseDTO= postService.getPopular(token);
+            return ResponseEntity.ok(postResponseDTO);
+        }catch (Exception e){
+            PostResponseDTO emptyResponse=new PostResponseDTO();
+            return ResponseEntity.badRequest().body(emptyResponse);
+        }
+    }
 }
