@@ -2,6 +2,7 @@ package com.example.YNN.controller;
 
 import com.example.YNN.DTO.PostPictureUploadDTO;
 import com.example.YNN.DTO.PostRequestDTO;
+import com.example.YNN.DTO.PostResponseDTO;
 import com.example.YNN.service.PostServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -28,6 +29,18 @@ public class PostController {
             return  ResponseEntity.ok("게시물 작성 완료");
         }catch (Exception e){
             return ResponseEntity.badRequest().body("게시물 작성 실패"+e.getMessage());
+        }
+    }
+
+    //최신 게시물 불러오기
+    @GetMapping("/api/post/new")
+    ResponseEntity<PostResponseDTO> getNewPost(@RequestHeader("Authorization") String token){
+        try {
+            PostResponseDTO postResponseDTO= postService.getNewPost(token);
+            return ResponseEntity.ok(postResponseDTO);
+        }catch (Exception e){
+            PostResponseDTO emptyResponse=new PostResponseDTO();
+            return ResponseEntity.badRequest().body(emptyResponse);
         }
     }
 }

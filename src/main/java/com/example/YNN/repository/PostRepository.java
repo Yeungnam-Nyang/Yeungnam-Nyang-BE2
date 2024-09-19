@@ -10,4 +10,7 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post,Long> {
     //내가 쓴 글 조회
     List<Post> findAllByUserUserId(String userId);
+    //최신 게시물 가져오기
+    List<Post> findAllByOrderByCreatedAtDesc();
+
 }

@@ -2,6 +2,7 @@ package com.example.YNN.service;
 
 import com.example.YNN.DTO.PostPictureUploadDTO;
 import com.example.YNN.DTO.PostRequestDTO;
+import com.example.YNN.DTO.PostResponseDTO;
 import com.example.YNN.model.*;
 import com.example.YNN.repository.*;
 import com.example.YNN.util.JwtUtil;
@@ -27,6 +28,7 @@ public class PostServiceImpl implements PostService{
     private final LocationRepository locationRepository;
     private final CatMapRepository catMapRepository;
     private final PostRepository postRepository;
+    private final PostPictureRepository postPictureRepository;
     @Override
     @Transactional
     public Long writePost(PostRequestDTO postRequestDTO, List<MultipartFile> files, String token) throws IOException {
@@ -90,4 +92,32 @@ public class PostServiceImpl implements PostService{
         //성공시 작성한 게시물 번호 반환
         return post.getPostId();
     }
+    //최신 게시물 불러오기
+    @Transactional
+    @Override
+    public PostResponseDTO getNewPost(String token) {
+        //유저 아이디 가져오기
+        String userId=jwtUtil.getUserId(token);
+        List<Post> postList=postRepository.findAllByOrderByCreatedAtDesc();
+        Post newPost= postList.get(0);
+
+        //사진가져오기
+        List<Picture> pictures=postPictureRepository.findByPost_PostId(newPost.getPostId());
+        List<String> pictureUrls=pictures.stream()
+                .map(Picture::getPictureUrl)
+                .toList();
+        //DTO생성
+        PostResponseDTO postResponseDTO= PostResponseDTO.builder()
+                .postDate(String.valueOf(newPost.getCreatedAt()))
+                .content(newPost.getContent())
+                .userId(userId)
+                .catName(newPost.getCatName())
+                .pictureUrl(pictureUrls)
+                .build();
+
+        //제이슨 형식 DTO리턴
+        return postResponseDTO;
+    }
+
+
 }
