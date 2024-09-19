@@ -75,7 +75,7 @@ public class JwtUtil {
     //JWT Claims 추출
     public Claims parseClaims(String accessToken){
         try{
-            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJwt(accessToken).getBody();
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
         }catch (ExpiredJwtException e){
             return e.getClaims();
         }
