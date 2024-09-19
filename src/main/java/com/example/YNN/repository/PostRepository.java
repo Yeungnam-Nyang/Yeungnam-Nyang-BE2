@@ -16,4 +16,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     //좋아요 가장 많은 게시물 가져오기
     List<Post>  findAllByOrderByLikeCntDesc();
 
+    //postId로 게시물 찾기
+    Post findByPostId(Long postId);
+
 }
