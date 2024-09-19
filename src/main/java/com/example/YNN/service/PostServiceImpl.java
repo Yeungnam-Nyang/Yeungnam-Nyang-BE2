@@ -12,11 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.xml.stream.events.Comment;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -148,16 +150,32 @@ public class PostServiceImpl implements PostService{
 
     }
 
-    @Override
-    public PostDetailDTO getDetail(String token, Long postId) {
-        return null;
-    }
 
-//    @Override
-//    @Transactional
-//    public PostDetailDTO getDetail(String token, Long postId) {
-//
-//    }
+    @Override
+    @Transactional
+    public PostDetailDTO getDetail(String token, Long postId) {
+       Post findPost=postRepository.findByPostId(postId);
+
+       //사진 정보 불러오기
+        List<Picture> pictures=postPictureRepository.findByPost_PostId(findPost.getPostId());
+        List<String> pictureUrls=pictures.stream()
+                .map(Picture::getPictureUrl)
+                .toList();
+
+
+        //반환DTO생성
+        PostDetailDTO postDetailDTO=PostDetailDTO.builder()
+                .content(findPost.getContent())
+                .postDate(String.valueOf(findPost.getCreatedAt()))
+                .pictureUrl(pictureUrls)
+                .likeCnt(findPost.getLikeCnt())
+                .userId(findPost.getUser().getUserId())
+                .catName(findPost.getCatName())
+                //댓글은 보류
+                .build();
+
+        return postDetailDTO;
+    }
 
     //게시물 상세보기
 
