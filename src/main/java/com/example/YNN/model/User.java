@@ -4,6 +4,8 @@ import com.example.YNN.Enums.SecurityQuestion;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -33,6 +35,9 @@ public class User {
 
     //대답
     private String userAnswer;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    private List<Post> posts;
 
     //비밀번호만 변경
     public void setNewPassword(String newPassword){

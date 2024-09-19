@@ -58,7 +58,7 @@ public class JwtUtil {
     //JWT검증
     public boolean validationToken(String token){
         try{
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJwt(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         }catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e){
             log.info("Invalid JWT Token",e);
@@ -75,9 +75,14 @@ public class JwtUtil {
     //JWT Claims 추출
     public Claims parseClaims(String accessToken){
         try{
-            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJwt(accessToken).getBody();
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
         }catch (ExpiredJwtException e){
             return e.getClaims();
         }
+    }
+
+    //JWt토큰 header -> "BEAR" 제거
+    public String getAccessToken(String token){
+        return token.startsWith("Bearer ")?token.substring(7):token;
     }
 }
