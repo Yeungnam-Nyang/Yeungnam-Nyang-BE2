@@ -1,5 +1,7 @@
 package com.example.YNN.config;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -15,5 +17,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true); // credentials 허용
+    }
+    @Bean
+    public ModelMapper metodoQueCriaUmModelMapper(){
+        return new ModelMapper();
     }
 }
