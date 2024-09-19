@@ -5,14 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalTime;
+import javax.xml.stream.events.Comment;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PostResponseDTO {
+public class PostDetailDTO {
     //고양이 이름
     private String catName;
 
@@ -33,11 +33,7 @@ public class PostResponseDTO {
     //사진
     private List<String> pictureUrl;
 
-    //에러 메시지
-    private String error;
+    //댓글
+    private List<Comment> comments;
 
-
-    public PostResponseDTO(String error) {
-        this.error=error;
-    }
 }

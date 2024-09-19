@@ -1,5 +1,6 @@
 package com.example.YNN.service;
 
+import com.example.YNN.DTO.PostDetailDTO;
 import com.example.YNN.DTO.PostPictureUploadDTO;
 import com.example.YNN.DTO.PostRequestDTO;
 import com.example.YNN.DTO.PostResponseDTO;
@@ -96,8 +97,7 @@ public class PostServiceImpl implements PostService{
     @Transactional
     @Override
     public PostResponseDTO getNewPost(String token) {
-        //유저 아이디 가져오기
-        String userId=jwtUtil.getUserId(token);
+
         List<Post> postList=postRepository.findAllByOrderByCreatedAtDesc();
         Post newPost= postList.get(0);
 
@@ -112,7 +112,7 @@ public class PostServiceImpl implements PostService{
                 .likeCnt(newPost.getLikeCnt())
                 .commentCnt(newPost.getCommentCnt())
                 .content(newPost.getContent())
-                .userId(userId)
+                .userId(newPost.getUser().getUserId())
                 .catName(newPost.getCatName())
                 .pictureUrl(pictureUrls)
                 .build();
@@ -124,8 +124,6 @@ public class PostServiceImpl implements PostService{
     @Transactional
     @Override
     public PostResponseDTO getPopular(String token) {
-        //유저 아이디 가져오기
-        String userId=jwtUtil.getUserId(token);
         List<Post> postList=postRepository.findAllByOrderByLikeCntDesc();
         Post popularPost= postList.get(0);
 
@@ -140,7 +138,7 @@ public class PostServiceImpl implements PostService{
                 .content(popularPost.getContent())
                 .commentCnt(popularPost.getCommentCnt())
                 .likeCnt(popularPost.getLikeCnt())
-                .userId(userId)
+                .userId(popularPost.getUser().getUserId())
                 .catName(popularPost.getCatName())
                 .pictureUrl(pictureUrls)
                 .build();
@@ -149,5 +147,19 @@ public class PostServiceImpl implements PostService{
         return postResponseDTO;
 
     }
+
+    @Override
+    public PostDetailDTO getDetail(String token, Long postId) {
+        return null;
+    }
+
+//    @Override
+//    @Transactional
+//    public PostDetailDTO getDetail(String token, Long postId) {
+//
+//    }
+
+    //게시물 상세보기
+
 
 }

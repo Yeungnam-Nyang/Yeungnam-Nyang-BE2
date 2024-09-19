@@ -1,5 +1,6 @@
 package com.example.YNN.service;
 
+import com.example.YNN.DTO.PostDetailDTO;
 import com.example.YNN.DTO.PostPictureUploadDTO;
 import com.example.YNN.DTO.PostRequestDTO;
 import com.example.YNN.DTO.PostResponseDTO;
@@ -17,4 +18,7 @@ public interface PostService {
 
     //인기 게시물 가져오기
     PostResponseDTO getPopular(String token);
+
+    //게시물 상세보기
+    PostDetailDTO getDetail(String token,Long postId);
 }
