@@ -1,6 +1,5 @@
 package com.example.YNN.controller;
 
-import com.example.YNN.DTO.PostPictureUploadDTO;
 import com.example.YNN.DTO.PostRequestDTO;
 import com.example.YNN.DTO.PostResponseDTO;
 import com.example.YNN.service.PostServiceImpl;
