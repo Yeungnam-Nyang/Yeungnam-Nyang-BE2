@@ -83,7 +83,7 @@ public class PostServiceImpl implements PostService{
                     throw new RuntimeException(e);
                 }
                 Picture photo= Picture.builder()
-                        .pictureUrl("/postImages/"+imageFileName)
+                        .pictureUrl(imageFileName)
                         .post(post)
                         .build();
 
