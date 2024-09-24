@@ -1,9 +1,6 @@
 package com.example.YNN.service;
 
-import com.example.YNN.DTO.PostDetailDTO;
-import com.example.YNN.DTO.PostPictureUploadDTO;
-import com.example.YNN.DTO.PostRequestDTO;
-import com.example.YNN.DTO.PostResponseDTO;
+import com.example.YNN.DTO.*;
 import com.example.YNN.model.*;
 import com.example.YNN.repository.*;
 import com.example.YNN.util.JwtUtil;

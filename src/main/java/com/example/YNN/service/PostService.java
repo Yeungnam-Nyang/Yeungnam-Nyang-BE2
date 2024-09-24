@@ -1,9 +1,6 @@
 package com.example.YNN.service;
 
-import com.example.YNN.DTO.PostDetailDTO;
-import com.example.YNN.DTO.PostPictureUploadDTO;
-import com.example.YNN.DTO.PostRequestDTO;
-import com.example.YNN.DTO.PostResponseDTO;
+import com.example.YNN.DTO.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
