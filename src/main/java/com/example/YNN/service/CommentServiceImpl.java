@@ -61,7 +61,8 @@ public class CommentServiceImpl implements CommentService {
             throw e; // 트랜잭션 롤백을 위해 예외 재발생
         }
     }
-
+    
+    @Transactional(readOnly = true)
     @Override
     public List<CommentResponseDTO> getCommentsByPost(Long postId) { // 게시글의 댓글 조회하는 로직
         Post post = postRepository.findById(postId)
