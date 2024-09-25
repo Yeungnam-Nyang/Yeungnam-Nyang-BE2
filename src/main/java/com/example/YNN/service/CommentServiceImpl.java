@@ -72,7 +72,6 @@ public class CommentServiceImpl implements CommentService {
                 .map(comment -> CommentResponseDTO.builder()
                         .commentId(comment.getCommentId())
                         .content(comment.getContent())
-                        .userId(comment.getUser().getUserId())
                         .postDate(comment.getCreatedAt().toString())
                         .build())
                 .toList();
