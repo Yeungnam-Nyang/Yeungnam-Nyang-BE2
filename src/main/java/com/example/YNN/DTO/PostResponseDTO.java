@@ -1,5 +1,6 @@
 package com.example.YNN.DTO;
 
+import com.example.YNN.model.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class PostResponseDTO {
+    //포스트 아이디
+    private Long postId;
     //고양이 이름
     private String catName;
 

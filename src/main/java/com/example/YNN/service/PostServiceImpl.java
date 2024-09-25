@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.xml.stream.events.Comment;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -29,6 +28,7 @@ public class PostServiceImpl implements PostService{
     private final CatMapRepository catMapRepository;
     private final PostRepository postRepository;
     private final PostPictureRepository postPictureRepository;
+    private final CommentRepository commentRepository;
     @Override
     @Transactional
     public Long writePost(PostRequestDTO postRequestDTO, List<MultipartFile> files, String token) throws IOException {
@@ -39,6 +39,7 @@ public class PostServiceImpl implements PostService{
                 .orElseGet(()->Location.builder()
                         .latitude(postRequestDTO.getLatitude())
                         .longitude(postRequestDTO.getLongitude())
+                        .address(postRequestDTO.getAddress())
                         .time(LocalTime.now())
                         .build());
         locationRepository.save(location);
@@ -104,7 +105,7 @@ public class PostServiceImpl implements PostService{
         List<Picture> pictures=postPictureRepository.findByPost_PostId(newPost.getPostId());
         List<String> pictureUrls=pictures.stream()
                 .map(Picture::getPictureUrl)
-                .toList();
+                .toList();;
         //DTO생성
         PostResponseDTO postResponseDTO= PostResponseDTO.builder()
                 .postDate(String.valueOf(newPost.getCreatedAt()))
@@ -114,6 +115,7 @@ public class PostServiceImpl implements PostService{
                 .userId(newPost.getUser().getUserId())
                 .catName(newPost.getCatName())
                 .pictureUrl(pictureUrls)
+                .postId(newPost.getPostId())
                 .build();
 
         //제이슨 형식 DTO리턴
@@ -131,6 +133,8 @@ public class PostServiceImpl implements PostService{
         List<String> pictureUrls=pictures.stream()
                 .map(Picture::getPictureUrl)
                 .toList();
+        //댓글 가져오기
+        List<Comment> comments=commentRepository.findByPost(popularPost);
         //DTO생성
         PostResponseDTO postResponseDTO= PostResponseDTO.builder()
                 .postDate(String.valueOf(popularPost.getCreatedAt()))
@@ -140,6 +144,7 @@ public class PostServiceImpl implements PostService{
                 .userId(popularPost.getUser().getUserId())
                 .catName(popularPost.getCatName())
                 .pictureUrl(pictureUrls)
+                .postId(popularPost.getPostId())
                 .build();
 
         //제이슨 형식 DTO리턴
@@ -168,7 +173,6 @@ public class PostServiceImpl implements PostService{
                 .likeCnt(findPost.getLikeCnt())
                 .userId(findPost.getUser().getUserId())
                 .catName(findPost.getCatName())
-                //댓글은 보류
                 .build();
 
         return postDetailDTO;
