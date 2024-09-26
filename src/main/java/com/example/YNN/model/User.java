@@ -4,6 +4,7 @@ import com.example.YNN.Enums.SecurityQuestion;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,6 +39,10 @@ public class User {
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<Post> posts;
+
+    //게시물 저장
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+    private List<Scrap> scraps=new ArrayList<>();
 
     //비밀번호만 변경
     public void setNewPassword(String newPassword){

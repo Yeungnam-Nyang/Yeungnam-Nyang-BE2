@@ -55,4 +55,7 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<CatMap> catMaps = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    private List<Scrap> scraps=new ArrayList<>();
+
 }
