@@ -1,10 +1,7 @@
 package com.example.YNN.model;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access=AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class Scrap {
     //scrap아이디
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
