@@ -39,6 +39,7 @@ public class PostServiceImpl implements PostService{
                 .orElseGet(()->Location.builder()
                         .latitude(postRequestDTO.getLatitude())
                         .longitude(postRequestDTO.getLongitude())
+                        .address(postRequestDTO.getAddress())
                         .time(LocalTime.now())
                         .build());
         locationRepository.save(location);

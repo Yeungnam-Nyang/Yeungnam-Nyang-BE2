@@ -1,6 +1,7 @@
 package com.example.YNN.model;
 
 import com.example.YNN.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
