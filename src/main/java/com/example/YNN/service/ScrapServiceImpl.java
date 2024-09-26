@@ -98,6 +98,7 @@ public class ScrapServiceImpl implements ScrapService {
                 .map(scrap -> {
                     PostResponseDTO postResponseDTO = PostResponseDTO
                             .builder()
+                            .postId(scrap.getPost().getPostId())
                             .content(scrap.getPost().getContent())
                             .catName(scrap.getPost().getCatName())
                             .pictureUrl(scrap.getPost().getPhotos().stream()
