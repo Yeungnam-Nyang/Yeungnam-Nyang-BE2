@@ -5,6 +5,7 @@ import com.example.YNN.model.*;
 import com.example.YNN.repository.*;
 import com.example.YNN.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -176,6 +178,22 @@ public class PostServiceImpl implements PostService{
                 .build();
 
         return postDetailDTO;
+    }
+
+    @Override
+    @Transactional
+    public String deletePost(Long postId, String userId) {
+        //삭제하고자 하는 게시물이 존재하지 않는 경우
+        Post post=postRepository.findByPostId(postId);
+        if(post==null)throw  new IllegalStateException("존재하지 않는 게시물");
+
+        //삭제하는 유저가 게시물을 작성한 유저 체크
+        if(!Objects.equals(post.getUser().getUserId(), userId)){
+            throw  new IllegalStateException("작성자만 게시물을 삭제할 수 있습니다.");
+        }
+
+        postRepository.delete(post);
+        return "게시물이 삭제되었습니다.";
     }
 
     //게시물 상세보기

@@ -18,4 +18,12 @@ public interface PostService {
 
     //게시물 상세보기
     PostDetailDTO getDetail(String token,Long postId);
+
+    //게시물 삭제
+    String deletePost(Long postId,String userId);
+    //게시물 수정
+
+    //게시물 저장
+
+    //게시물 신고
 }
