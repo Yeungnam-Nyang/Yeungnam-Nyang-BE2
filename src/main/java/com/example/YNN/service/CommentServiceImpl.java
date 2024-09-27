@@ -12,6 +12,7 @@ import com.example.YNN.util.JwtUtil;
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,7 +69,8 @@ public class CommentServiceImpl implements CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("게시물을 찾을 수 없습니다.")); // 마찬가지로 람다로 예외 처리
 
-        List<Comment> comments = commentRepository.findByPost(post); // 댓글 repo에서 post 조회해서 댓글들 다 List로 저장
+        //** 댓글 조회할 때 "createdAt"을 내림차순으로 정렬(최신순) **//
+        List<Comment> comments = commentRepository.findByPost(post, Sort.by(Sort.Direction.DESC, "createdAt")); // 댓글 repo에서 post 조회해서 댓글들 다 List로 저장
         return comments.stream()
                 .map(comment -> CommentResponseDTO.builder()
                         .commentId(comment.getCommentId())
