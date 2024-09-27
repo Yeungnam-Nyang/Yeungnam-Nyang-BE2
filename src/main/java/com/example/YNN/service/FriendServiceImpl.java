@@ -6,6 +6,7 @@ import com.example.YNN.model.Friend;
 import com.example.YNN.model.User;
 import com.example.YNN.repository.FriendRepository;
 import com.example.YNN.repository.UserRepository;
+import com.example.YNN.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +20,13 @@ public class FriendServiceImpl implements FriendService {
 
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
     @Override
     @Transactional
-    public FriendResponseDTO addFriend(String userId, String friendId) {
+    public FriendResponseDTO addFriend(String token, String friendId) { // 여기서 토큰은 로그인 한 유저의 token임!
+        //** userId를 JWT로 추출하는 부분 **//
+        String userId = jwtUtil.getUserId(token);
         User friendUser = userRepository.findByUserId(friendId);
         if (friendUser == null) {
             return new FriendResponseDTO("해당 유저는 존재하지 않습니다.", null, friendId);
@@ -47,7 +51,7 @@ public class FriendServiceImpl implements FriendService {
 
         // 새로운 친구 요청 생성
         Friend friendRequest = Friend.builder()
-                .user(userRepository.findByUserId(userId))
+                .user(userRepository.findByUserId(userId)) //** 수정 후 여기서의 userId는 token으로 추출한 userId임 **//
                 .friendId(friendId)
                 .status(FriendRequestStatus.REQUESTED)
                 .build();
@@ -100,7 +104,9 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     @Transactional
-    public FriendResponseDTO cancelFriendRequest(String userId, String friendId) {
+    public FriendResponseDTO cancelFriendRequest(String token, String friendId) { // 마찬가지로 token은 로그인 한 유저 토큰임
+
+        String userId = jwtUtil.getUserId(token);
         Friend friendRequest = friendRepository.findByUser_UserIdAndFriendId(userId, friendId);
         if (friendRequest == null || friendRequest.getStatus() != FriendRequestStatus.REQUESTED) {
             return new FriendResponseDTO("친구 요청이 없거나 이미 처리되었습니다.", null, friendId);
