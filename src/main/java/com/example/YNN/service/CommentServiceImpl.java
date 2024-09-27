@@ -30,7 +30,7 @@ public class CommentServiceImpl implements CommentService {
     private final JwtUtil jwtUtil;
 
     @Override
-    public void addComment(CommentRequestDTO commentRequestDTO, String token) throws IOException { // 댓글 추가하는 로직
+    public void addComment(CommentRequestDTO commentRequestDTO, String token) throws IOException { //** 댓글 추가하는 로직 **//
         log.info("댓글 추가 요청 수신됨: {}", commentRequestDTO);
 
         try {
@@ -64,7 +64,7 @@ public class CommentServiceImpl implements CommentService {
     
     @Transactional(readOnly = true)
     @Override
-    public List<CommentResponseDTO> getCommentsByPost(Long postId) { // 게시글의 댓글 조회하는 로직
+    public List<CommentResponseDTO> getCommentsByPost(Long postId) { //** 게시글의 댓글 조회하는 로직 **//
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("게시물을 찾을 수 없습니다.")); // 마찬가지로 람다로 예외 처리
 
@@ -76,5 +76,24 @@ public class CommentServiceImpl implements CommentService {
                         .postDate(comment.getCreatedAt().toString())
                         .build())
                 .toList();
+    }
+
+    @Override
+    public void deleteComment(Long commentId, String token) { //** 댓글 삭제 로직 **//
+        try {
+            String userId = jwtUtil.getUserId(token);
+            Comment comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+
+            if (!comment.getUser().getUserId().equals(userId)) { // 댓글 작성자만 삭제할 수 있게 검증
+                throw new RuntimeException("댓글을 삭제할 권한이 없습니다.");
+            }
+
+            commentRepository.delete(comment); // 댓글 삭제
+            log.info("댓글 삭제 성공: {}", commentId);
+        } catch (Exception e) {
+            log.error("댓글 삭제 중 오류 발생: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 }
