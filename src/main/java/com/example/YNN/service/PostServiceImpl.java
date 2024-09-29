@@ -151,7 +151,7 @@ public class PostServiceImpl implements PostService{
     @Override
     @Transactional
     public PostDetailDTO getDetail(String token, Long postId) {
-       Post findPost=postRepository.findByPostId(postId);
+       Post findPost=postRepository.findByPostId(postId).orElse(null);
 
        //사진 정보 불러오기
         List<Picture> pictures=postPictureRepository.findByPost_PostId(findPost.getPostId());

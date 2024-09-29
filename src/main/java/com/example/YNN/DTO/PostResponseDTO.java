@@ -13,6 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class PostResponseDTO {
+    //포스트 아이디
+    private Long postId;
     //고양이 이름
     private String catName;
 
