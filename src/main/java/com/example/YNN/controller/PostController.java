@@ -93,4 +93,37 @@ public class PostController {
         }
 
     }
+
+    //내 게시물 확인
+    @GetMapping("/api/post/my/{postId}")
+    ResponseEntity<StateResponse> isMyPost(@RequestHeader("Authorization") String token, @PathVariable("postId") Long postId) {
+        //jwt토큰 검사
+        if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new StateResponse("401", "토큰 오류")
+            );
+        }
+        Boolean isMyPost = postService.isMyPost(postId, jwtUtil.getUserId(token));
+        //내 게시물인 경우
+        if (isMyPost) {
+            return ResponseEntity.ok(new StateResponse("200", "TRUE"));
+        }
+        return ResponseEntity.badRequest().body(new StateResponse("400", "FALSE"));
+    }
+
+    //게시물 상세보기
+    @GetMapping("/api/post/{postId}")
+    ResponseEntity<PostResponseDTO> postDetail(@RequestHeader("Authorization") String token, @PathVariable("postId") Long postId){
+        //jwt토큰 검사
+        if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new PostResponseDTO("유효하지 않은 토큰"));
+        }
+        try{
+           PostResponseDTO postResponseDTO= postService.getDetail(postId);
+           return ResponseEntity.ok().body(postResponseDTO);
+        }catch (Exception e){
+            PostResponseDTO emptyResponseDTO=new PostResponseDTO();
+            return ResponseEntity.badRequest().body(emptyResponseDTO);
+        }
+    }
 }

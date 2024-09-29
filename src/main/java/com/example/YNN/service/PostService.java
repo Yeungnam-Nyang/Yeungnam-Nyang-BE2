@@ -17,13 +17,12 @@ public interface PostService {
     PostResponseDTO getPopular(String token);
 
     //게시물 상세보기
-    PostDetailDTO getDetail(String token,Long postId);
+    PostResponseDTO getDetail(Long postId);
 
     //게시물 삭제
     String deletePost(Long postId,String userId);
     //게시물 수정
 
-    //게시물 저장
-
-    //게시물 신고
+    //자신의 게시물인지 확인
+    Boolean isMyPost(Long postId,String userId);
 }

@@ -39,6 +39,9 @@ public class PostResponseDTO {
     //에러 메시지
     private String error;
 
+    //주소
+    private String address;
+
 
     public PostResponseDTO(String error) {
         this.error=error;

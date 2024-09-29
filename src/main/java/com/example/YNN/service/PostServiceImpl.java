@@ -4,6 +4,7 @@ import com.example.YNN.DTO.*;
 import com.example.YNN.model.*;
 import com.example.YNN.repository.*;
 import com.example.YNN.util.JwtUtil;
+import jdk.dynalink.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -157,7 +158,7 @@ public class PostServiceImpl implements PostService{
 
     @Override
     @Transactional
-    public PostDetailDTO getDetail(String token, Long postId) {
+    public PostResponseDTO getDetail(Long postId) {
        Post findPost=postRepository.findByPostId(postId);
 
        //사진 정보 불러오기
@@ -166,18 +167,22 @@ public class PostServiceImpl implements PostService{
                 .map(Picture::getPictureUrl)
                 .toList();
 
+        //위치정보
+        String address=locationRepository.findAddressByPostId(findPost.getPostId());
 
         //반환DTO생성
-        PostDetailDTO postDetailDTO=PostDetailDTO.builder()
+        PostResponseDTO postResponseDTO=PostResponseDTO.builder()
+                .postId(findPost.getPostId())
                 .content(findPost.getContent())
                 .postDate(String.valueOf(findPost.getCreatedAt()))
                 .pictureUrl(pictureUrls)
                 .likeCnt(findPost.getLikeCnt())
                 .userId(findPost.getUser().getUserId())
                 .catName(findPost.getCatName())
+                .address(address)
                 .build();
 
-        return postDetailDTO;
+        return postResponseDTO;
     }
 
     @Override
@@ -194,6 +199,18 @@ public class PostServiceImpl implements PostService{
 
         postRepository.delete(post);
         return "게시물이 삭제되었습니다.";
+    }
+
+    @Override
+    public Boolean isMyPost(Long postId, String userId) {
+        Post post= postRepository.findByPostId(postId);
+        User user=userRepository.findByUserId(userId);
+        //게시뭏이 존재하지 않는 경우
+        if(post==null || user==null)return false;
+        if(!userId.equals(post.getUser().getUserId())){
+            return false;
+        }
+        return true;
     }
 
     //게시물 상세보기
