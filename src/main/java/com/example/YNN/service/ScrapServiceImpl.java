@@ -31,20 +31,12 @@ public class ScrapServiceImpl implements ScrapService {
         User user = userRepository.findByUserId(userId);
         Post post = postRepository.findByPostId(postId).orElse(null);
         //게시물이 존재하지 않는 경우
-        if (post == null) {
-            return StateResponse.builder()
-                    .message("존재하지 않는 게시물입니다.")
-                    .code("404")
-                    .build();
-        }
+       StateResponse postCheck=checkEntity(post,"게시물");
+       if(postCheck!=null)return postCheck;
 
-        //user가 존재하지 않는 경우
-        if(user==null){
-            return StateResponse.builder()
-                    .message("존재하지 않는 회원입니다.")
-                    .code("404")
-                    .build();
-        }
+       //유저가 존재하지않는 경우
+        StateResponse userCheck=checkEntity(user,"회원");
+        if(userCheck!=null)return userCheck;
 
         Optional<Scrap> scrap=scrapRepository.findByUserAndPost(user,post);
 
@@ -74,7 +66,13 @@ public class ScrapServiceImpl implements ScrapService {
         User user=userRepository.findByUserId(userId);
         Post post=postRepository.findByPostId(postId).orElse(null);
         Optional<Scrap> scrap=scrapRepository.findByUserAndPost(user,post);
+        //게시물이 존재하지 않는 경우
+        StateResponse postCheck=checkEntity(post,"게시물");
+        if(postCheck!=null)return postCheck;
 
+        //유저가 존재하지않는 경우
+        StateResponse userCheck=checkEntity(user,"회원");
+        if(userCheck!=null)return userCheck;
         //스크랩 기록이 있다면
         if(scrap.isPresent()){
             scrapRepository.delete(scrap.get());
@@ -124,5 +122,15 @@ public class ScrapServiceImpl implements ScrapService {
             return scrap.isPresent();
         }
         return false;
+    }
+
+    private <T>StateResponse checkEntity(T entity,String entityName){
+        if(entity==null){
+            return StateResponse.builder()
+                    .message("존재하지 않는 "+entityName+"입니다.")
+                    .code("404")
+                    .build();
+        }
+        return null;
     }
 }
