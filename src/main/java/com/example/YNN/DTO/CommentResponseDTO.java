@@ -14,5 +14,6 @@ public class CommentResponseDTO { // 댓글 응답할 때 DTO
     private Long commentId; // 댓글 ID
     private String content; // 댓글 내용
     private String commentDate; // 댓글 작성 및 수정 시간
+    private String userId; // 작성자 ID
 
 }

@@ -76,6 +76,7 @@ public class CommentServiceImpl implements CommentService {
                         .commentId(comment.getCommentId())
                         .content(comment.getContent())
                         .commentDate(comment.getCreatedAt().toString())
+                        .userId(comment.getUser().getUserId())
                         .build())
                 .toList();
     }
