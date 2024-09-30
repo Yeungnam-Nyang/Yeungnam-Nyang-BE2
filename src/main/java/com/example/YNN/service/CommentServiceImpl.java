@@ -75,7 +75,7 @@ public class CommentServiceImpl implements CommentService {
                 .map(comment -> CommentResponseDTO.builder()
                         .commentId(comment.getCommentId())
                         .content(comment.getContent())
-                        .postDate(comment.getCreatedAt().toString())
+                        .commentDate(comment.getCreatedAt().toString())
                         .build())
                 .toList();
     }
@@ -95,6 +95,34 @@ public class CommentServiceImpl implements CommentService {
             log.info("댓글 삭제 성공: {}", commentId);
         } catch (Exception e) {
             log.error("댓글 삭제 중 오류 발생: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void updateComment(Long commentId, CommentRequestDTO commentRequestDTO, String token) { //** 댓글 수정 로직 **//
+        try {
+            String userId = jwtUtil.getUserId(token);
+            Comment comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
+
+            if (!comment.getUser().getUserId().equals(userId)) { // 댓글 작성자만 수정할 수 있게 검증
+                throw new RuntimeException("댓글을 수정할 권한이 없습니다.");
+            }
+
+            Comment updateComment = Comment.builder()
+                    .commentId(comment.getCommentId())
+                    .post(comment.getPost())
+                    .user(comment.getUser())
+                    .content(commentRequestDTO.getContent())
+                    .createdAt(comment.getCreatedAt())
+                    .updatedAt(LocalDateTime.now()) // 현재 수정한 시간을 기준으로 수정 날짜 update
+                    .build();
+
+            commentRepository.save(updateComment); // 수정 댓글 DB에 저장
+            log.info("댓글 수정 성공: {}", commentId);
+        } catch (Exception e) {
+            log.error("댓글 수정 중 오류 발생: {}", e.getMessage(), e);
             throw e;
         }
     }
