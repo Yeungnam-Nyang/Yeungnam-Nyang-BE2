@@ -68,4 +68,21 @@ public class CommentController {
             return ResponseEntity.badRequest().body("댓글 삭제 실패: " + e.getMessage());
         }
     }
+
+    //** 댓글 수정 **//
+    @PutMapping("/api/comment/update/{commentId}") // 댓글 수정 API
+    public ResponseEntity<String> updateComment(@PathVariable Long commentId,
+                                                @RequestBody CommentRequestDTO commentRequestDTO,
+                                                @RequestHeader("Authorization") String token) {
+
+        if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰");
+        }
+        try {
+            commentService.updateComment(commentId, commentRequestDTO, token);
+            return ResponseEntity.ok("댓글 수정 완료");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("댓글 수정 실패: " + e.getMessage());
+        }
+    }
 }
