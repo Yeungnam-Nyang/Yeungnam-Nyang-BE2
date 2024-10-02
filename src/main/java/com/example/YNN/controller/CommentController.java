@@ -21,6 +21,7 @@ public class CommentController {
     private final CommentServiceImpl commentService;
     private final JwtUtil jwtUtil;
 
+    //** 댓글 작성 **//
     @PostMapping("/api/comment/add") // 댓글 작성 api
     public ResponseEntity<String> addComment(@RequestBody CommentRequestDTO commentRequestDTO,
                                              @RequestHeader("Authorization") String token) {
@@ -36,6 +37,7 @@ public class CommentController {
         }
     }
 
+    //** 게시물 댓글 조회 **//
     @GetMapping("/api/comment/post/{postId}") // 댓글 목록 가져오기 api
     public ResponseEntity<List<CommentResponseDTO>> getCommentsByPost(@PathVariable Long postId,
                                                                       @RequestHeader("Authorization") String token) {
@@ -48,6 +50,22 @@ public class CommentController {
             return ResponseEntity.ok(comments);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    //** 댓글 삭제 **//
+    @DeleteMapping("/api/comment/delete/{commentId}") // 댓글 삭제 API
+    public ResponseEntity<String> deleteComment(@PathVariable Long commentId,
+                                                @RequestHeader("Authorization") String token) {
+
+        if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰");
+        }
+        try {
+            commentService.deleteComment(commentId, token);
+            return ResponseEntity.ok("댓글 삭제 완료");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("댓글 삭제 실패: " + e.getMessage());
         }
     }
 }

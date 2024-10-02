@@ -10,4 +10,6 @@ public interface CommentService {
     void addComment(CommentRequestDTO commentRequestDTO, String token); // 댓글 작성
 
     List<CommentResponseDTO> getCommentsByPost(Long postId); // 게시글 목록 List로 가져오기
+
+    void deleteComment(Long commentId, String token); // 댓글 삭제
 }

@@ -136,8 +136,7 @@ public class PostServiceImpl implements PostService{
         List<String> pictureUrls=pictures.stream()
                 .map(Picture::getPictureUrl)
                 .toList();
-        //댓글 가져오기
-        List<Comment> comments=commentRepository.findByPost(popularPost);
+
         //DTO생성
         PostResponseDTO postResponseDTO= PostResponseDTO.builder()
                 .postDate(String.valueOf(popularPost.getCreatedAt()))
@@ -160,7 +159,6 @@ public class PostServiceImpl implements PostService{
     @Transactional
     public PostResponseDTO getDetail(Long postId) {
        Post findPost=postRepository.findByPostId(postId);
-
        //사진 정보 불러오기
         List<Picture> pictures=postPictureRepository.findByPost_PostId(findPost.getPostId());
         List<String> pictureUrls=pictures.stream()

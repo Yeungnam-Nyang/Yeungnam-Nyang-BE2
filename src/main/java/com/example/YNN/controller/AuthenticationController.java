@@ -1,7 +1,9 @@
 package com.example.YNN.controller;
 
 import com.example.YNN.DTO.LoginRequestDTO;
+import com.example.YNN.model.User;
 import com.example.YNN.service.AuthServiceImpl;
+import com.example.YNN.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,9 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +21,7 @@ import java.util.Map;
 @Tag(name = "로그인",description = "회원 로그인 API")
 public class AuthenticationController {
     private final AuthServiceImpl authService;
+    private final JwtUtil jwtUtil;
 
     //로그인 하기
     @PostMapping("/api/login")
@@ -37,5 +38,11 @@ public class AuthenticationController {
         Map<String,String> response=new HashMap<>();
         response.put("token",token);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    //유저아이디 알려주기
+    @GetMapping("/api/me")
+    public String getMyUserId(@RequestHeader("Authorization") String token){
+        return jwtUtil.getUserId(token);
     }
 }

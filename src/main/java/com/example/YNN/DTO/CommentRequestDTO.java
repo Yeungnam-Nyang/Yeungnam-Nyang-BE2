@@ -13,5 +13,4 @@ public class CommentRequestDTO { // 댓글 요청 받을 DTO
 
     private String content; // 댓글 내용
     private Long postId; // 댓글이 달린 게시물 ID
-    private String userId; // 작성자 ID
 }

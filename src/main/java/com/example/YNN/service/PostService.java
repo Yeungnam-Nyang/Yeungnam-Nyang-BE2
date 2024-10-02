@@ -1,10 +1,12 @@
 package com.example.YNN.service;
 
 import com.example.YNN.DTO.*;
+import com.example.YNN.model.Post;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public interface PostService {
     //post 작성하기
