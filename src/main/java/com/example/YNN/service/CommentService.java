@@ -12,4 +12,6 @@ public interface CommentService {
     List<CommentResponseDTO> getCommentsByPost(Long postId); // 게시글 목록 List로 가져오기
 
     void deleteComment(Long commentId, String token); // 댓글 삭제
+
+    void updateComment(Long commentId, CommentRequestDTO commentRequestDTO, String token); // 댓글 수정
 }

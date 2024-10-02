@@ -37,4 +37,8 @@ public class Comment {
     @CreationTimestamp // JPA로 자동으로 시간 설정한 게 DB에 들어가게끔
     @DateTimeFormat(pattern = "yyyy-MM-dd/HH:mm:ss")
     private LocalDateTime createdAt; // 댓글 생성 날짜
+
+    @CreationTimestamp // JPA로 자동으로 시간 설정한 게 DB에 들어가게끔
+    @DateTimeFormat(pattern = "yyyy-MM-dd/HH:mm:ss")
+    private LocalDateTime updatedAt; // 댓글 수정 날짜
 }
