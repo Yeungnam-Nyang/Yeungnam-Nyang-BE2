@@ -24,12 +24,19 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     @Transactional
-    public FriendResponseDTO addFriend(String token, String friendId) { // 여기서 토큰은 로그인 한 유저의 token임!
-        //** userId를 JWT로 추출하는 부분 **//
-        String userId = jwtUtil.getUserId(token);
+    public FriendResponseDTO addFriend(String userId, String friendId) { // 여기서 토큰은 로그인 한 유저의 token임!
+        if (userId.equals(friendId)) {
+            throw new IllegalArgumentException("자기 자신에게 친구 요청을 보낼 수 없습니다.");
+        }
+
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("로그인한 유저가 존재하지 않습니다.");
+        }
+
         User friendUser = userRepository.findByUserId(friendId);
         if (friendUser == null) {
-            return new FriendResponseDTO("해당 유저는 존재하지 않습니다.", null, friendId);
+            throw new IllegalArgumentException("해당 유저는 존재하지 않습니다.");
         }
         // 이미 존재하는 친구 요청 조회 (거절된 상태 포함)
         Friend existingFriend = friendRepository.findByUser_UserIdAndFriendId(userId, friendId);
@@ -104,9 +111,7 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     @Transactional
-    public FriendResponseDTO cancelFriendRequest(String token, String friendId) { // 마찬가지로 token은 로그인 한 유저 토큰임
-
-        String userId = jwtUtil.getUserId(token);
+    public FriendResponseDTO cancelFriendRequest(String userId, String friendId) { // 마찬가지로 token은 로그인 한 유저 토큰임
         Friend friendRequest = friendRepository.findByUser_UserIdAndFriendId(userId, friendId);
         if (friendRequest == null || friendRequest.getStatus() != FriendRequestStatus.REQUESTED) {
             return new FriendResponseDTO("친구 요청이 없거나 이미 처리되었습니다.", null, friendId);
