@@ -57,7 +57,7 @@ public class PostController {
     }
 
     //인기 게시물 불러오가
-    @GetMapping("/api/post/popuar")
+    @GetMapping("/api/post/popular")
     ResponseEntity<PostResponseDTO> getPopularPost(@RequestHeader("Authorization") String token){
         //jwt토큰 유효성 검사
         if(!jwtUtil.validationToken(jwtUtil.getAccessToken(token))){
