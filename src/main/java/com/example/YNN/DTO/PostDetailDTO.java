@@ -13,6 +13,10 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class PostDetailDTO {
+
+    //해당 게시글 ID
+    private Long postId;
+
     //고양이 이름
     private String catName;
 
@@ -35,5 +39,8 @@ public class PostDetailDTO {
 
     //댓글
     private List<Comment> comments;
+
+    // 사용자가 좋아요를 눌렀는지에 대한 여부
+    private boolean likedByUser;
 
 }

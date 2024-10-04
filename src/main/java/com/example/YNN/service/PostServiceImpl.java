@@ -29,6 +29,7 @@ public class PostServiceImpl implements PostService{
     private final CatMapRepository catMapRepository;
     private final PostRepository postRepository;
     private final PostPictureRepository postPictureRepository;
+    private final LikeRepository likeRepository;
     @Override
     @Transactional
     public Long writePost(PostRequestDTO postRequestDTO, List<MultipartFile> files, String token) throws IOException {
@@ -105,8 +106,18 @@ public class PostServiceImpl implements PostService{
         List<String> pictureUrls=pictures.stream()
                 .map(Picture::getPictureUrl)
                 .toList();
+
+        // 사용자 정보 가져오기
+        String userId = jwtUtil.getUserId(token);
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new RuntimeException("사용자를 찾을 수 없습니다.");
+        }
+        boolean likedByUser = likeRepository.findByPostAndUser(newPost, user).isPresent();
+
         //DTO생성
         PostResponseDTO postResponseDTO= PostResponseDTO.builder()
+                .postId(newPost.getPostId())
                 .postDate(String.valueOf(newPost.getCreatedAt()))
                 .likeCnt(newPost.getLikeCnt())
                 .commentCnt(newPost.getCommentCnt())
@@ -114,6 +125,7 @@ public class PostServiceImpl implements PostService{
                 .userId(newPost.getUser().getUserId())
                 .catName(newPost.getCatName())
                 .pictureUrl(pictureUrls)
+                .likedByUser(likedByUser)
                 .build();
 
         //제이슨 형식 DTO리턴
@@ -131,8 +143,20 @@ public class PostServiceImpl implements PostService{
         List<String> pictureUrls=pictures.stream()
                 .map(Picture::getPictureUrl)
                 .toList();
+
+        String userId = jwtUtil.getUserId(token);
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new RuntimeException("사용자를 찾을 수 없습니다.");
+        }
+
+        // 사용자가 해당 게시물에 좋아요를 눌렀는지 확인
+        boolean likedByUser = likeRepository.findByPostAndUser(popularPost, user).isPresent();
+
+
         //DTO생성
         PostResponseDTO postResponseDTO= PostResponseDTO.builder()
+                .postId(popularPost.getPostId())
                 .postDate(String.valueOf(popularPost.getCreatedAt()))
                 .content(popularPost.getContent())
                 .commentCnt(popularPost.getCommentCnt())
@@ -140,6 +164,7 @@ public class PostServiceImpl implements PostService{
                 .userId(popularPost.getUser().getUserId())
                 .catName(popularPost.getCatName())
                 .pictureUrl(pictureUrls)
+                .likedByUser(likedByUser)
                 .build();
 
         //제이슨 형식 DTO리턴
@@ -147,7 +172,7 @@ public class PostServiceImpl implements PostService{
 
     }
 
-
+    // 게시물 상세보기
     @Override
     @Transactional
     public PostDetailDTO getDetail(String token, Long postId) {
@@ -159,6 +184,13 @@ public class PostServiceImpl implements PostService{
                 .map(Picture::getPictureUrl)
                 .toList();
 
+        // 사용자 정보 가져오기
+        String userId = jwtUtil.getUserId(token);
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new RuntimeException("사용자를 찾을 수 없습니다.");
+        }
+        boolean likedByUser = likeRepository.findByPostAndUser(findPost, user).isPresent();
 
         //반환DTO생성
         PostDetailDTO postDetailDTO=PostDetailDTO.builder()
@@ -168,6 +200,7 @@ public class PostServiceImpl implements PostService{
                 .likeCnt(findPost.getLikeCnt())
                 .userId(findPost.getUser().getUserId())
                 .catName(findPost.getCatName())
+                .likedByUser(likedByUser)
                 //댓글은 보류
                 .build();
 
