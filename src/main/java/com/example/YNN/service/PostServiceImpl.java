@@ -108,12 +108,14 @@ public class PostServiceImpl implements PostService{
         List<Picture> pictures=postPictureRepository.findByPost_PostId(newPost.getPostId());
         List<String> pictureUrls=pictures.stream()
                 .map(Picture::getPictureUrl)
-                .toList();;
+                .toList();
+
+
         //DTO생성
         PostResponseDTO postResponseDTO= PostResponseDTO.builder()
                 .postDate(String.valueOf(newPost.getCreatedAt()))
                 .likeCnt(newPost.getLikeCnt())
-                .commentCnt(newPost.getCommentCnt())
+                .commentCnt((long) newPost.getComments().size())
                 .content(newPost.getContent())
                 .userId(newPost.getUser().getUserId())
                 .catName(newPost.getCatName())
@@ -141,7 +143,7 @@ public class PostServiceImpl implements PostService{
         PostResponseDTO postResponseDTO= PostResponseDTO.builder()
                 .postDate(String.valueOf(popularPost.getCreatedAt()))
                 .content(popularPost.getContent())
-                .commentCnt(popularPost.getCommentCnt())
+                .commentCnt((long) popularPost.getComments().size())
                 .likeCnt(popularPost.getLikeCnt())
                 .userId(popularPost.getUser().getUserId())
                 .catName(popularPost.getCatName())
@@ -170,6 +172,7 @@ public class PostServiceImpl implements PostService{
 
         //반환DTO생성
         PostResponseDTO postResponseDTO=PostResponseDTO.builder()
+                .commentCnt((long) findPost.getComments().size())
                 .postId(findPost.getPostId())
                 .content(findPost.getContent())
                 .postDate(String.valueOf(findPost.getCreatedAt()))
