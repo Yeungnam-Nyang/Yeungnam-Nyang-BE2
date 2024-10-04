@@ -12,7 +12,7 @@ public interface FriendService {
     FriendResponseDTO addFriend(String userId, String friendId);
 
     // 친구 상태 확인
-    FriendResponseDTO getFriendStatus(String userId, String friendId); // 수정된 메서드
+    FriendResponseDTO getFriendStatus(String userId, String friendId);
 
     // 친구 목록 조회
     List<FriendResponseDTO> getFriendsList(String userId);

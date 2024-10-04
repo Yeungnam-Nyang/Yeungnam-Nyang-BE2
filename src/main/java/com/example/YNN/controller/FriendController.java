@@ -6,6 +6,7 @@ import com.example.YNN.Enums.FriendRequestStatus;
 import com.example.YNN.service.FriendService;
 import com.example.YNN.util.JwtUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class FriendController {
 
     // 친구 추가 요청하는 api
     @PostMapping("/api/friend/add")
-    public ResponseEntity<FriendResponseDTO> addFriend(@RequestBody FriendRequestDTO friendRequestDTO,
+    public ResponseEntity<FriendResponseDTO> addFriend(@Valid @RequestBody FriendRequestDTO friendRequestDTO,
                                                        @RequestHeader("Authorization") String token) {
         if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
