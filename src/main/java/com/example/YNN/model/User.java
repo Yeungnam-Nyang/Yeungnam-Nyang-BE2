@@ -44,9 +44,17 @@ public class User {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<Scrap> scraps=new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "profileId")
+    private Profile profileImage;  // 프로필 사진
+
     //비밀번호만 변경
     public void setNewPassword(String newPassword){
         this.userPassword=newPassword;
+    }
+
+    public void changeProfileImage(Profile profileImage) {
+        this.profileImage = profileImage;
     }
 
 }
