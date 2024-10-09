@@ -20,6 +20,9 @@ public interface FriendService {
     // 친구 요청에 대한 응답 (수락/거절)
     FriendResponseDTO respondToFriendRequest(String userId, String friendId, FriendRequestStatus status);
 
-    // 친구 요청 취소 (Service 인터페이스에 추가된 메서드)
+    // 친구 요청 취소
     FriendResponseDTO cancelFriendRequest(String userId, String friendId);
+
+    // 친구 요청 목록 조회
+    List<FriendResponseDTO> getSentFriendRequests(String userId);
 }

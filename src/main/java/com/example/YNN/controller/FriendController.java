@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "친구", description = "친구 API")
@@ -101,5 +103,18 @@ public class FriendController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    // 친구 요청 보낸 목록 조회하는 api
+    @GetMapping("/api/friend/sent-requests")
+    public ResponseEntity<List<FriendResponseDTO>> getSentFriendRequests(@RequestHeader("Authorization") String token) {
+        if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        String userId = jwtUtil.getUserId(token);
+
+        List<FriendResponseDTO> sentRequests = friendService.getSentFriendRequests(userId);
+        return ResponseEntity.ok(sentRequests);
     }
 }

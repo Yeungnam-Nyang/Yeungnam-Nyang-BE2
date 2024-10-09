@@ -134,4 +134,21 @@ public class FriendServiceImpl implements FriendService {
                         friend.getFriendId())) // 친구 ID도 응답에 포함
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FriendResponseDTO> getSentFriendRequests(String userId) {
+        // REQUESTED 상태인 친구 요청 목록 조회
+        List<FriendRequestStatus> statuses = List.of(FriendRequestStatus.REQUESTED);
+
+        List<Friend> sentRequests = friendRepository.findByUser_UserIdAndStatusIn(userId, statuses);
+
+        return sentRequests.stream()
+                .map(friend -> FriendResponseDTO.builder()
+                        .message("친구 요청을 보냈습니다.")
+                        .status(friend.getStatus())
+                        .friendId(friend.getFriendId())
+                        .build())
+                .collect(Collectors.toList());
+    }
 }
