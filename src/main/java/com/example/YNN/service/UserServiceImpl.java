@@ -23,12 +23,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUserId(userId);
         Profile profile = profileRepository.findByUser(user).orElse(null);
 
+        String defaultProfileUrl = "http://localhost:8080/images/토벤머리.png"; // 기본 프로필 이미지 URL
+
         return UserProfileDTO.builder()
                 .userId(user.getUserId())
                 .studentName(user.getStudent().getStudentName())
                 .schoolName(user.getStudent().getSchoolName())
                 .departmentName(user.getStudent().getDepartmentName())
-                .profileURL(profile != null ? profile.getProfileURL() : "")
+                .profileURL(profile != null ? profile.getProfileURL() : defaultProfileUrl) // 기본 프로필 URL 사용
                 .build();
     }
 
