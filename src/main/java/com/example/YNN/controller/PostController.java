@@ -60,7 +60,9 @@ public class PostController {
 
     //인기 게시물 불러오가
     @GetMapping("/api/post/popular")
-    ResponseEntity<PostResponseDTO> getPopularPost(@RequestHeader("Authorization") String token) {
+
+    ResponseEntity<PostResponseDTO> getPopularPost(@RequestHeader("Authorization") String token){
+
         //jwt토큰 유효성 검사
         if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new PostResponseDTO("유효하지 않은 토큰"));
@@ -119,11 +121,25 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new PostResponseDTO("유효하지 않은 토큰"));
         }
         try{
-           PostResponseDTO postResponseDTO= postService.getDetail(postId);
+           PostResponseDTO postResponseDTO= postService.getDetail(postId,token);
            return ResponseEntity.ok().body(postResponseDTO);
         }catch (Exception e){
             PostResponseDTO emptyResponseDTO=new PostResponseDTO();
             return ResponseEntity.badRequest().body(emptyResponseDTO);
         }
+    }
+
+    //게시물 갯수 리턴
+    @GetMapping("/api/post/count/{userId}")
+    ResponseEntity<StateResponse> getNumOfPosts(@RequestHeader("Authorization")String token,@PathVariable("userId")String userId){
+        //jwt토큰 검사
+        if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new StateResponse("401", "토큰 오류")
+            );
+        }
+        int num=postService.getNumberOfPosts(userId);
+        return ResponseEntity.ok(new StateResponse("200",String.valueOf(num)));
+
     }
 }
