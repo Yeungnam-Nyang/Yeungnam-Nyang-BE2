@@ -28,6 +28,10 @@ public class Location {
     @NotNull(message = "경도는 필수입니다.")
     private Double longitude;
 
+    //도로명 주소
+    @NotNull(message = "주소는 필수입니다.")
+    private String address;
+
 
     //시간
     @CreatedDate

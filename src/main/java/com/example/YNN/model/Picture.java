@@ -15,7 +15,7 @@ public class Picture {
 
     private String pictureUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name ="postId")
     private Post post;
 }

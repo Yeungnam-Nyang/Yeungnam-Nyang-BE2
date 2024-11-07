@@ -52,10 +52,13 @@ public class Post {
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<Picture> photos;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<CatMap> catMaps = new ArrayList<>();
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<Scrap> scraps=new ArrayList<>();
+
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    private List<Comment> comments=new ArrayList<>();
 
 }

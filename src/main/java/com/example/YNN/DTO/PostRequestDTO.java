@@ -28,6 +28,10 @@ public class PostRequestDTO {
     @NotNull(message = "경도는 필수입니다.")
     private Double longitude;
 
+    //도로명 주소
+    @NotNull(message = "주소는 필수입니다.")
+    private String address;
+
     //고양이 이름
     @NotNull(message = "고양이의 이름은 필수입니다.")
     private String catName;
