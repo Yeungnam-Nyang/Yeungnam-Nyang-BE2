@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-
+@Table(name = "post")
 public class Post {
     //게시물 id
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
