@@ -29,7 +29,7 @@ public class ScrapServiceImpl implements ScrapService {
     @Override
     public StateResponse scrap(String userId, Long postId) {
         User user = userRepository.findByUserId(userId);
-        Post post = postRepository.findByPostId(postId).orElse(null);
+        Post post = postRepository.findByPostId(postId);
         //게시물이 존재하지 않는 경우
        StateResponse postCheck=checkEntity(post,"게시물");
        if(postCheck!=null)return postCheck;
@@ -64,7 +64,7 @@ public class ScrapServiceImpl implements ScrapService {
     @Transactional(readOnly = true)
     public StateResponse deleteScrap(String userId, Long postId) {
         User user=userRepository.findByUserId(userId);
-        Post post=postRepository.findByPostId(postId).orElse(null);
+        Post post=postRepository.findByPostId(postId);
         Optional<Scrap> scrap=scrapRepository.findByUserAndPost(user,post);
         //게시물이 존재하지 않는 경우
         StateResponse postCheck=checkEntity(post,"게시물");
@@ -115,7 +115,7 @@ public class ScrapServiceImpl implements ScrapService {
     @Override
     public Boolean checkScrap(String userId, Long postId) {
         User user=userRepository.findByUserId(userId);
-        Post post=postRepository.findByPostId(postId).orElse(null);
+        Post post=postRepository.findByPostId(postId);
         Optional<Scrap> scrap=scrapRepository.findByUserAndPost(user,post);
 
         if(user!=null && post!=null){
