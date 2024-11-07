@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "picture")
 public class Picture {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)

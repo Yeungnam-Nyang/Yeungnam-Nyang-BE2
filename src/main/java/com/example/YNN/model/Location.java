@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name = "location")
 public class Location {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long locationId;
