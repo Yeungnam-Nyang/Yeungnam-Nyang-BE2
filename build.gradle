@@ -13,14 +13,6 @@ java {
 	}
 }
 
-bootJar {
-	enabled = false
-}
-
-jar {
-	enabled = true
-}
-
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
