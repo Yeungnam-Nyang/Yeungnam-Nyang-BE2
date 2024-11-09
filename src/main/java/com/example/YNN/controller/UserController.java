@@ -18,6 +18,7 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
+    //* 유저 프로필 조회
     @GetMapping("/api/user/profile")
     public ResponseEntity<UserProfileDTO> getUserProfile(@RequestHeader("Authorization") String token) {
         if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
@@ -34,6 +35,7 @@ public class UserController {
         }
     }
 
+    //* 유저 프로필 이미지 업데이트
     @PutMapping("/api/user/profile/image")
     public ResponseEntity<Void> updateProfileImage(
             @RequestHeader("Authorization") String token,
@@ -50,5 +52,19 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    //* 유저 프로필 정보 수정
+    @PutMapping("/api/user/profile/update")
+    public ResponseEntity<String> updateUserProfile(
+            @RequestHeader("Authorization") String token,
+            @RequestBody UserProfileDTO userProfileDTO) {
+        if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String userId = jwtUtil.getUserId(token);
+        userService.updateUserProfile(userId, userProfileDTO);
+        return ResponseEntity.ok().build();
     }
 }
