@@ -1,6 +1,7 @@
 package com.example.YNN.model;
 
 
+import com.example.YNN.util.EmojiConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

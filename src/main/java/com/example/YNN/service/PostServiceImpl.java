@@ -58,6 +58,7 @@ public class PostServiceImpl implements PostService{
                 .catName(postRequestDTO.getCatName())
                 .user(user)
                 .createdAt(LocalDateTime.now())
+                .catStopWatch(LocalDateTime.now())
                 .likeCnt(0L)
                 .commentCnt(0L)
                 .build();
@@ -215,7 +216,8 @@ public class PostServiceImpl implements PostService{
                 .likeCnt(findPost.getLikeCnt())
                 .userId(findPost.getUser().getUserId())
                 .catName(findPost.getCatName())
-
+                .catStopWatch(findPost.getCatStopWatch().toString())
+                .catFoodCnt(findPost.getCatFoodCnt())
                 .address(address)
                 .likedByUser(likedByUser)
                 //댓글은 보류
@@ -260,6 +262,24 @@ public class PostServiceImpl implements PostService{
        }else{
            return postRepository.findAllByUserUserId(userId).size();
        }
+    }
+
+    @Transactional
+    @Override
+    public LocalDateTime updateCatStopWatch(String userId, Long postId) {
+        //게시물 찾기
+        Post post=postRepository.findByPostId(postId);
+
+        //고양이 밥 준 횟수가 3회 이상이라면 이전 시간
+        if(post.getCatFoodCnt()>3)return post.getCatStopWatch();
+
+        //밥 준 횟수 늘리고 업데이트 된 시간 리턴
+        Post newPost=post.toBuilder()
+                .catFoodCnt(post.getCatFoodCnt()+1)
+                .catStopWatch(LocalDateTime.now())
+                .build();
+        postRepository.save(newPost);
+        return newPost.getCatStopWatch();
     }
 
     //게시물 상세보기
