@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "picture")
 public class Picture {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true)
@@ -15,7 +16,7 @@ public class Picture {
 
     private String pictureUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name ="postId")
     private Post post;
 }

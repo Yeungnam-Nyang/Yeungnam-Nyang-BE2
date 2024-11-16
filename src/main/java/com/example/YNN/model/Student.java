@@ -8,6 +8,7 @@ import lombok.*;
 @Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name = "student")
 public class Student {
     //id값
     @Id

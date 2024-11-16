@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name = "location")
 public class Location {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long locationId;
@@ -27,6 +28,10 @@ public class Location {
     //경도
     @NotNull(message = "경도는 필수입니다.")
     private Double longitude;
+
+    //도로명 주소
+    @NotNull(message = "주소는 필수입니다.")
+    private String address;
 
 
     //시간

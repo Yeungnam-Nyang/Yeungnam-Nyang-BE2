@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Builder
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "catmap")
 public class CatMap  {
 
     @EmbeddedId

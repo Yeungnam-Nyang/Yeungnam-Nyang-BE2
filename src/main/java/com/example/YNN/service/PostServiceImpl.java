@@ -4,17 +4,19 @@ import com.example.YNN.DTO.*;
 import com.example.YNN.model.*;
 import com.example.YNN.repository.*;
 import com.example.YNN.util.JwtUtil;
+import jdk.dynalink.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.xml.stream.events.Comment;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,7 +31,9 @@ public class PostServiceImpl implements PostService{
     private final CatMapRepository catMapRepository;
     private final PostRepository postRepository;
     private final PostPictureRepository postPictureRepository;
+    private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
+
     @Override
     @Transactional
     public Long writePost(PostRequestDTO postRequestDTO, List<MultipartFile> files, String token) throws IOException {
@@ -40,6 +44,7 @@ public class PostServiceImpl implements PostService{
                 .orElseGet(()->Location.builder()
                         .latitude(postRequestDTO.getLatitude())
                         .longitude(postRequestDTO.getLongitude())
+                        .address(postRequestDTO.getAddress())
                         .time(LocalTime.now())
                         .build());
         locationRepository.save(location);
@@ -81,7 +86,7 @@ public class PostServiceImpl implements PostService{
                     throw new RuntimeException(e);
                 }
                 Picture photo= Picture.builder()
-                        .pictureUrl("/postImages/"+imageFileName)
+                        .pictureUrl(imageFileName)
                         .post(post)
                         .build();
 
@@ -107,6 +112,7 @@ public class PostServiceImpl implements PostService{
                 .map(Picture::getPictureUrl)
                 .toList();
 
+
         // 사용자 정보 가져오기
         String userId = jwtUtil.getUserId(token);
         User user = userRepository.findByUserId(userId);
@@ -115,16 +121,18 @@ public class PostServiceImpl implements PostService{
         }
         boolean likedByUser = likeRepository.findByPostAndUser(newPost, user).isPresent();
 
+
         //DTO생성
         PostResponseDTO postResponseDTO= PostResponseDTO.builder()
                 .postId(newPost.getPostId())
                 .postDate(String.valueOf(newPost.getCreatedAt()))
                 .likeCnt(newPost.getLikeCnt())
-                .commentCnt(newPost.getCommentCnt())
+                .commentCnt((long) newPost.getComments().size())
                 .content(newPost.getContent())
                 .userId(newPost.getUser().getUserId())
                 .catName(newPost.getCatName())
                 .pictureUrl(pictureUrls)
+                .postId(newPost.getPostId())
                 .likedByUser(likedByUser)
                 .build();
 
@@ -159,11 +167,12 @@ public class PostServiceImpl implements PostService{
                 .postId(popularPost.getPostId())
                 .postDate(String.valueOf(popularPost.getCreatedAt()))
                 .content(popularPost.getContent())
-                .commentCnt(popularPost.getCommentCnt())
+                .commentCnt((long) popularPost.getComments().size())
                 .likeCnt(popularPost.getLikeCnt())
                 .userId(popularPost.getUser().getUserId())
                 .catName(popularPost.getCatName())
                 .pictureUrl(pictureUrls)
+                .postId(popularPost.getPostId())
                 .likedByUser(likedByUser)
                 .build();
 
@@ -175,14 +184,17 @@ public class PostServiceImpl implements PostService{
     // 게시물 상세보기
     @Override
     @Transactional
-    public PostDetailDTO getDetail(String token, Long postId) {
-       Post findPost=postRepository.findByPostId(postId).orElse(null);
-
+    public PostResponseDTO getDetail(Long postId,String token) {
+       Post findPost=postRepository.findByPostId(postId);
        //사진 정보 불러오기
         List<Picture> pictures=postPictureRepository.findByPost_PostId(findPost.getPostId());
         List<String> pictureUrls=pictures.stream()
                 .map(Picture::getPictureUrl)
                 .toList();
+
+
+        //위치정보
+        String address=locationRepository.findAddressByPostId(findPost.getPostId());
 
         // 사용자 정보 가져오기
         String userId = jwtUtil.getUserId(token);
@@ -192,19 +204,62 @@ public class PostServiceImpl implements PostService{
         }
         boolean likedByUser = likeRepository.findByPostAndUser(findPost, user).isPresent();
 
+
         //반환DTO생성
-        PostDetailDTO postDetailDTO=PostDetailDTO.builder()
+        PostResponseDTO postResponseDTO=PostResponseDTO.builder()
+                .commentCnt((long) findPost.getComments().size())
+                .postId(findPost.getPostId())
                 .content(findPost.getContent())
                 .postDate(String.valueOf(findPost.getCreatedAt()))
                 .pictureUrl(pictureUrls)
                 .likeCnt(findPost.getLikeCnt())
                 .userId(findPost.getUser().getUserId())
                 .catName(findPost.getCatName())
+
+                .address(address)
                 .likedByUser(likedByUser)
                 //댓글은 보류
                 .build();
 
-        return postDetailDTO;
+        return postResponseDTO;
+    }
+
+    @Override
+    @Transactional
+    public String deletePost(Long postId, String userId) {
+        //삭제하고자 하는 게시물이 존재하지 않는 경우
+        Post post=postRepository.findByPostId(postId);
+        if(post==null)throw  new IllegalStateException("존재하지 않는 게시물");
+
+        //삭제하는 유저가 게시물을 작성한 유저 체크
+        if(!Objects.equals(post.getUser().getUserId(), userId)){
+            throw  new IllegalStateException("작성자만 게시물을 삭제할 수 있습니다.");
+        }
+
+        postRepository.delete(post);
+        return "게시물이 삭제되었습니다.";
+    }
+
+    @Override
+    public Boolean isMyPost(Long postId, String userId) {
+        Post post= postRepository.findByPostId(postId);
+        User user=userRepository.findByUserId(userId);
+        //게시뭏이 존재하지 않는 경우
+        if(post==null || user==null)return false;
+        if(!userId.equals(post.getUser().getUserId())){
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public Integer getNumberOfPosts(String userId) {
+        //유저가 존재하지 않을 때 -1 리턴
+       if(!userRepository.existsByUserId(userId)){
+           return -1;
+       }else{
+           return postRepository.findAllByUserUserId(userId).size();
+       }
     }
 
     //게시물 상세보기

@@ -12,7 +12,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "Users")
+@Table(name = "users")
 public class User {
 
     //회원 ID

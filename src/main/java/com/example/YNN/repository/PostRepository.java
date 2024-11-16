@@ -18,6 +18,6 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     List<Post>  findAllByOrderByLikeCntDesc();
 
     //postId로 게시물 찾기
-    Optional<Post> findByPostId(Long postId);
+    Post findByPostId(Long postId);
 
 }
