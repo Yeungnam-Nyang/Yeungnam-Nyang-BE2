@@ -17,7 +17,7 @@ public class Profile {
 
     private String profileURL; // 프로필 사진 URL
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "userId")
     private User user; // User와의 연관관계
 }
