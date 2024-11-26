@@ -1,13 +1,11 @@
 package com.example.YNN.model;
 
-import com.example.YNN.model.User;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "student")
@@ -38,6 +36,4 @@ public class Student {
     public void setUser(User user){
         this.user=user;
     }
-
-
 }
