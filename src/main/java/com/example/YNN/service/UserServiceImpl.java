@@ -1,3 +1,4 @@
+
 package com.example.YNN.service;
 
 import com.example.YNN.DTO.UserProfileDTO;
@@ -7,6 +8,7 @@ import com.example.YNN.model.User;
 import com.example.YNN.repository.ProfileRepository;
 import com.example.YNN.repository.StudentRepository;
 import com.example.YNN.repository.UserRepository;
+import com.example.YNN.service.s3.S3Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final StudentRepository studentRepository;
     private final ProfileRepository profileRepository;
+    private final S3Service s3Service;
 
 
     @PersistenceContext
@@ -31,8 +34,8 @@ public class UserServiceImpl implements UserService {
     public UserProfileDTO getUserProfile(String userId) {
         User user = userRepository.findByUserId(userId);
         Profile profile = profileRepository.findByUser(user).orElse(null);
-
-        String defaultProfileUrl = "http://localhost:8080/images/토벤머리.png"; // 기본 프로필 이미지 URL
+        // 기본 프로필 이미지 URL : 내 S3 버킷의 /test 디렉토리에 세팅해둠.
+        String defaultProfileUrl = "https://ynn-server-bucket0425.s3.ap-northeast-2.amazonaws.com/test/ae464445-d9ea-4a05-94c2-5737ed85c9ee_%ED%86%A0%EB%B2%A4%EB%A8%B8%EB%A6%AC.png";
 
         return UserProfileDTO.builder()
                 .userId(user.getUserId())
@@ -47,14 +50,20 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateProfileImage(String userId, MultipartFile imageFile) {
         User user = userRepository.findByUserId(userId);
-        // 파일의 원래 이름을 URL로 사용
-        String newImageUrl = imageFile.getOriginalFilename(); // URL로 사용할 수 있음
-        Profile newProfileImage = Profile.builder()
-                .profileURL(newImageUrl)
-                .user(user)
+        // S3에 파일 업로드하고 URL 받기
+        String newImageUrl = s3Service.uploadFile(imageFile, "profiles");  // "profiles"는 S3에서 파일을 저장할 폴더 이름
+        // 기존 프로필이 있으면 업데이트
+        Profile profile = profileRepository.findByUser(user).orElse(
+                Profile.builder()
+                        .user(user)
+                        .build());
+        // Builder 패턴을 사용하여 새 프로필을 생성
+        profile = profile.toBuilder()
+                .profileURL(newImageUrl) // 새로 업로드된 이미지 URL을 설정
                 .build();
-        user.changeProfileImage(newProfileImage);
-        userRepository.save(user);
+        profileRepository.save(profile);
+        user.changeProfileImage(profile);  // 유저의 프로필을 업데이트 (Profile 엔티티와 연관)
+        userRepository.save(user);  // 유저 엔티티 저장
     }
 
     @Override

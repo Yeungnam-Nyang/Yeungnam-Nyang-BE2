@@ -1,8 +1,10 @@
+
 package com.example.YNN.service;
 
 import com.example.YNN.DTO.*;
 import com.example.YNN.model.*;
 import com.example.YNN.repository.*;
+import com.example.YNN.service.s3.S3Service;
 import com.example.YNN.util.JwtUtil;
 import jdk.dynalink.Operation;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +35,11 @@ public class PostServiceImpl implements PostService{
     private final PostPictureRepository postPictureRepository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
+    private final S3Service s3Service;
 
     @Override
     @Transactional
-    public Long writePost(PostRequestDTO postRequestDTO, List<MultipartFile> files, String token) throws IOException {
+    public Long writePost(PostRequestDTO postRequestDTO, List<MultipartFile> files, String token) {
         String userId= jwtUtil.getUserId(token);
         User user= userRepository.findByUserId(userId);
         //위치 저장
@@ -48,9 +51,6 @@ public class PostServiceImpl implements PostService{
                         .time(LocalTime.now())
                         .build());
         locationRepository.save(location);
-
-
-
 
         //게시물 작성
         Post post= Post.builder()
@@ -66,34 +66,25 @@ public class PostServiceImpl implements PostService{
         //CatMap 저장
         CatMapId catMapId=new CatMapId(post.getPostId(),location.getLocationId());
         CatMap catMap=CatMap.builder()
-                        .id(catMapId)
-                                .post(post)
-                                        .location(location)
-                                                .build();
+                .id(catMapId)
+                .post(post)
+                .location(location)
+                .build();
         catMapRepository.save(catMap);
 
 
-        //이미지 업로드
-        if(files!=null && !files.isEmpty()){
-            for(MultipartFile file:files){
-                UUID uuid=UUID.randomUUID();
-                String imageFileName=uuid+"_"+file.getOriginalFilename();
-                File destinationFile=new File(imageFileName);
-
-                try{
-                    file.transferTo(destinationFile);
-                }catch (IOException e){
-                    throw new RuntimeException(e);
-                }
-                Picture photo= Picture.builder()
-                        .pictureUrl(imageFileName)
+        // S3를 이용한 이미지 업로드
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                // S3에 업로드 및 URL 반환
+                String fileUrl = s3Service.uploadFile(file, "posts");
+                // Picture 엔티티 생성
+                Picture photo = Picture.builder()
+                        .pictureUrl(fileUrl) // S3 URL 저장
                         .post(post)
                         .build();
-
-                postImageRepository.save(photo);
-
+                postPictureRepository.save(photo);
             }
-
         }
         //성공시 작성한 게시물 번호 반환
         return post.getPostId();
@@ -185,8 +176,8 @@ public class PostServiceImpl implements PostService{
     @Override
     @Transactional
     public PostResponseDTO getDetail(Long postId,String token) {
-       Post findPost=postRepository.findByPostId(postId);
-       //사진 정보 불러오기
+        Post findPost=postRepository.findByPostId(postId);
+        //사진 정보 불러오기
         List<Picture> pictures=postPictureRepository.findByPost_PostId(findPost.getPostId());
         List<String> pictureUrls=pictures.stream()
                 .map(Picture::getPictureUrl)
@@ -255,14 +246,11 @@ public class PostServiceImpl implements PostService{
     @Override
     public Integer getNumberOfPosts(String userId) {
         //유저가 존재하지 않을 때 -1 리턴
-       if(!userRepository.existsByUserId(userId)){
-           return -1;
-       }else{
-           return postRepository.findAllByUserUserId(userId).size();
-       }
+        if(!userRepository.existsByUserId(userId)){
+            return -1;
+        }else{
+            return postRepository.findAllByUserUserId(userId).size();
+        }
     }
-
-    //게시물 상세보기
-
 
 }
