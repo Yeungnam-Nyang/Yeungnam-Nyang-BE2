@@ -19,7 +19,6 @@ import java.util.Map;
 @RestController
 @AllArgsConstructor
 @Tag(name = "회원가입", description = "회원 가입 API")
-@CrossOrigin(origins = "http://localhost:5173")
 public class SignUpController {
     private final SignUpServiceImpl signUpServiceImpl;
     private final SmsServiceImpl smsService;
