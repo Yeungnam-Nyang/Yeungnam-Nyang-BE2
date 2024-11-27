@@ -36,7 +36,7 @@ public class UserController {
     }
 
     //* 유저 프로필 이미지 업데이트
-    @PutMapping("/api/user/profile/image")
+    @PutMapping("/api/user/profile/image-update")
     public ResponseEntity<Void> updateProfileImage(
             @RequestHeader("Authorization") String token,
             @RequestParam("imageFile") MultipartFile imageFile) {
@@ -55,7 +55,7 @@ public class UserController {
     }
 
     //* 유저 프로필 정보 수정
-    @PutMapping("/api/user/profile/update")
+    @PutMapping("/api/user/profile/info-update")
     public ResponseEntity<String> updateUserProfile(
             @RequestHeader("Authorization") String token,
             @RequestBody UserProfileDTO userProfileDTO) {
