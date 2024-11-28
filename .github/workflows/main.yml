@@ -8,7 +8,7 @@ on:
 
 # --------------------------추가
 env:
-  PROJECT_NAME: ynn_project
+  PROJECT_NAME: Yeungnam-Nyang-BE2
   BUCKET_NAME: ynn-server-bucket0425
   CODE_DEPLOY_APP_NAME: ynn_cicd
   DEPLOYMENT_GROUP_NAME: YNN-Server
