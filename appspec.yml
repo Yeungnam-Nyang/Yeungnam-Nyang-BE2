@@ -3,11 +3,11 @@ os: linux
 
 files:
   - source: /
-    destination: /home/ubuntu/Yeungnam-Nyang-BE2
+    destination: /home/ec2-user/Yeungnam-Nyang-BE2
     overwrites: yes
 file_exits_behavior: OVERWRITE
 permissions:
-  - object: /home/ubuntu/Yeungnam-Nyang-BE2/
+  - object: /home/ec2-user/Yeungnam-Nyang-BE2/
     owner: ubuntu
     group: ubuntu
 hooks:
