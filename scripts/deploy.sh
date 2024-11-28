@@ -19,4 +19,4 @@ else
 fi
 
 echo "> Deploy - $JAR_PATH "
-nohup java -jar $JAR_PATH -Dspring.profiles.active=dev > /dev/null 2> /dev/null < /dev/null &
+nohup java -jar $JAR_PATH -Dspring.profiles.active=secret > /dev/null 2> /dev/null < /dev/null &
