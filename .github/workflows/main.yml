@@ -24,7 +24,7 @@ jobs:
         run: |
           cd ./src/main/resources
           touch ./application-secret.properties
-          echo "${{ secrets.PROPERTIES_SECRET }}" > ./application-secret.properties
+          echo "${{ secrets.Secret_Properties }}" > ./application-secret.properties
         shell: bash  
       
      # (2) JDK 설치
