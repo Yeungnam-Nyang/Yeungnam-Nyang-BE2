@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-REPOSITORY=/home/ubuntu/Yeungnam-Nyang-BE2
+REPOSITORY=/home/ec2-user/Yeungnam-Nyang-BE2
 cd $REPOSITORY
 
 APP_NAME=YNN
