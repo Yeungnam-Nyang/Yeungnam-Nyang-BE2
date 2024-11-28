@@ -1,18 +1,16 @@
 name: Build and Deploy Spring Boot to AWS EC2
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    types: [closed]
+    branches:
+      - main
 
-# --------------------------추가
 env:
   PROJECT_NAME: Yeungnam-Nyang-BE2
   BUCKET_NAME: ynn-server-bucket0425
   CODE_DEPLOY_APP_NAME: ynn_cicd
   DEPLOYMENT_GROUP_NAME: YNN-Server
-# --------------------------추가
 
 jobs:
   deploy:
@@ -21,6 +19,13 @@ jobs:
     # (1) GitHub Actions 체크아웃
       - name: Checkout Repository
         uses: actions/checkout@v3
+        
+      - name: make application-secret.properties
+        run: |
+          cd ./src/main/resources
+          touch ./application-secret.properties
+          echo "${{ secrets.PROPERTIES_SECRET }}" > ./application-secret.properties
+        shell: bash  
       
      # (2) JDK 설치
       - name: Set up JDK 17
