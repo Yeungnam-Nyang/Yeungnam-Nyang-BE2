@@ -4,8 +4,9 @@ os: linux
 files:
   - source: /
     destination: /home/ec2-user/Yeungnam-Nyang-BE2
-    overwrites: yes
+    overwrite: yes
 file_exits_behavior: OVERWRITE
+
 permissions:
   - object: /home/ec2-user/Yeungnam-Nyang-BE2/
     owner: ubuntu
