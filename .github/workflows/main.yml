@@ -16,7 +16,7 @@ env:
 
 jobs:
   deploy:
-    runs-on: linux
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       
