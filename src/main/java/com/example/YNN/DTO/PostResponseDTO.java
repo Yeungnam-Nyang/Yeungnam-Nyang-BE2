@@ -51,6 +51,9 @@ public class PostResponseDTO {
 
     //고양이 밥 횟수
     private int catFoodCnt;
+    //상태 메세지 전송
+    private String message;
+
     public PostResponseDTO(String error) {
         this.error=error;
     }
