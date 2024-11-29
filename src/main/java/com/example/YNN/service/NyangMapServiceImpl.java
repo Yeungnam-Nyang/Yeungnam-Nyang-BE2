@@ -9,6 +9,7 @@ import com.example.YNN.repository.PostRepository;
 import com.example.YNN.util.LocationCalculation;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class NyangMapServiceImpl implements NyangMapService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<NyangMapPostDTO> aroundPosts(double nowLatitude, double nowLongitude) {
         //게시물 불러오기
         List<Post> allPosts = postRepository.findAll();
