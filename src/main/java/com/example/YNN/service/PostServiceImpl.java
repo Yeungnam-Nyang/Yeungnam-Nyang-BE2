@@ -1,4 +1,3 @@
-
 package com.example.YNN.service;
 
 import com.example.YNN.DTO.*;
@@ -58,6 +57,7 @@ public class PostServiceImpl implements PostService{
                 .catName(postRequestDTO.getCatName())
                 .user(user)
                 .createdAt(LocalDateTime.now())
+                .catStopWatch(LocalDateTime.now())
                 .likeCnt(0L)
                 .commentCnt(0L)
                 .build();
@@ -83,8 +83,11 @@ public class PostServiceImpl implements PostService{
                         .pictureUrl(fileUrl) // S3 URL 저장
                         .post(post)
                         .build();
-                postPictureRepository.save(photo);
+
+                postImageRepository.save(photo);
+
             }
+
         }
         //성공시 작성한 게시물 번호 반환
         return post.getPostId();
@@ -267,5 +270,26 @@ public class PostServiceImpl implements PostService{
             return postRepository.findAllByUserUserId(userId).size();
         }
     }
+
+    @Transactional
+    @Override
+    public LocalDateTime updateCatStopWatch(String userId, Long postId) {
+        //게시물 찾기
+        Post post=postRepository.findByPostId(postId);
+
+        //고양이 밥 준 횟수가 3회 이상이라면 이전 시간
+        if(post.getCatFoodCnt()>3)return post.getCatStopWatch();
+
+        //밥 준 횟수 늘리고 업데이트 된 시간 리턴
+        Post newPost=post.toBuilder()
+                .catFoodCnt(post.getCatFoodCnt()+1)
+                .catStopWatch(LocalDateTime.now())
+                .build();
+        postRepository.save(newPost);
+        return newPost.getCatStopWatch();
+    }
+
+    //게시물 상세보기
+
 
 }

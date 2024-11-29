@@ -46,6 +46,11 @@ public class PostResponseDTO {
     // 사용자가 좋아요를 눌렀는지에 대한 여부
     private boolean likedByUser;
 
+    //밥 준 시간
+    private String catStopWatch;
+
+    //고양이 밥 횟수
+    private int catFoodCnt;
     //상태 메세지 전송
     private String message;
 
