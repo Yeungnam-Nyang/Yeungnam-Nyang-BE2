@@ -1,5 +1,6 @@
 package com.example.YNN.model;
 
+import com.example.YNN.util.EmojiConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -13,7 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "post")
@@ -43,6 +44,15 @@ public class Post {
     @CreatedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd/HH:mm:ss")
     private LocalDateTime createdAt;
+
+    //밥 주는 시간 설정
+    @CreatedDate
+    @DateTimeFormat(pattern = "yyyy-MM-dd/HH:mm:ss")
+    private LocalDateTime catStopWatch;
+
+    //고양이 밥 횟수
+    @ColumnDefault("0")
+    private int catFoodCnt;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

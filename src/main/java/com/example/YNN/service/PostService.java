@@ -5,6 +5,7 @@ import com.example.YNN.model.Post;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,4 +31,7 @@ public interface PostService {
 
     //유저의 게시글 수
     Integer getNumberOfPosts(String userId);
+
+    //고양이 밥 주기
+    LocalDateTime updateCatStopWatch(String userId, Long postId);
 }

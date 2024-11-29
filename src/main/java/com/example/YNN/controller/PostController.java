@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -140,6 +141,18 @@ public class PostController {
         }
         int num=postService.getNumberOfPosts(userId);
         return ResponseEntity.ok(new StateResponse("200",String.valueOf(num)));
+    }
 
+    //고양이 밥주기
+    @PutMapping("/api/post/catfood/{postId}")
+    ResponseEntity<?> feedingCat(@RequestHeader("Authorization")String token,@PathVariable("postId")Long postId){
+        //jwt토큰 검사
+        if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new StateResponse("401", "토큰 오류")
+            );
+        }
+        LocalDateTime catFeedtime=postService.updateCatStopWatch(jwtUtil.getUserId(token),postId);
+        return ResponseEntity.ok(new StateResponse("200",String.valueOf(catFeedtime)));
     }
 }

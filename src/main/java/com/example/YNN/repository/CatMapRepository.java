@@ -12,5 +12,6 @@ public interface CatMapRepository extends JpaRepository <CatMap,Long>{
     //특정 위치의 모든 CatMap 엔트리 찾기
     List<CatMap> findByLocation(Location location);
 
-
+    //post의 위치 찾기
+    CatMap findByPostPostId(Long postId);
 }
