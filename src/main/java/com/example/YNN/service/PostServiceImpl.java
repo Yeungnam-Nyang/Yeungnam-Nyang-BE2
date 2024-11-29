@@ -90,11 +90,19 @@ public class PostServiceImpl implements PostService{
         return post.getPostId();
     }
     //최신 게시물 불러오기
-    @Transactional
+
     @Override
     public PostResponseDTO getNewPost(String token) {
 
         List<Post> postList=postRepository.findAllByOrderByCreatedAtDesc();
+        //글이 없는 경우
+        if(postList.isEmpty()){
+            return PostResponseDTO
+                    .builder()
+                    .message("NULL")
+                    .build();
+        }
+        //게
         Post newPost= postList.get(0);
 
         //사진가져오기
@@ -131,10 +139,17 @@ public class PostServiceImpl implements PostService{
         return postResponseDTO;
     }
     //인기 게시물 가져오기
-    @Transactional
+
     @Override
     public PostResponseDTO getPopular(String token) {
         List<Post> postList=postRepository.findAllByOrderByLikeCntDesc();
+        //글이 없는 경우
+        if(postList.isEmpty()){
+            return PostResponseDTO
+                    .builder()
+                    .message("NULL")
+                    .build();
+        }
         Post popularPost= postList.get(0);
 
         //사진가져오기
@@ -174,7 +189,7 @@ public class PostServiceImpl implements PostService{
 
     // 게시물 상세보기
     @Override
-    @Transactional
+
     public PostResponseDTO getDetail(Long postId,String token) {
         Post findPost=postRepository.findByPostId(postId);
         //사진 정보 불러오기
