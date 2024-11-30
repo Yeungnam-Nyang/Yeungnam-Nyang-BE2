@@ -41,6 +41,34 @@ public class PostController {
         }
     }
 
+    // 게시물 수정 API
+    @PutMapping("/api/post/edit/{postId}")
+    ResponseEntity<StateResponse> updatePost( // StateResponse로 상태 처리
+            @RequestHeader("Authorization") String token, // 토큰값
+            @PathVariable("postId") Long postId, // 수정할 게시물 ID
+            @RequestPart PostRequestDTO postRequestDTO, // DTO랑 사진 파일 RequestPart로 수정할 값 입력받기
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+        // JWT 토큰 검사
+        if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new StateResponse("401", "유효하지 않은 토큰")
+            );
+        }
+        try {
+            // 게시물 수정 서비스 호출
+            postService.updatePost(postId, postRequestDTO, files, token);
+            return ResponseEntity.ok(new StateResponse("200", "게시물 수정 완료"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    new StateResponse("403", e.getMessage())
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    new StateResponse("400", "게시물 수정 실패: " + e.getMessage())
+            );
+        }
+    }
+
     //최신 게시물 불러오기
     @GetMapping("/api/post/new")
     ResponseEntity<PostResponseDTO> getNewPost(@RequestHeader("Authorization") String token) {
