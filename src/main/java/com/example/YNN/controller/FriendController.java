@@ -30,13 +30,10 @@ public class FriendController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        try {
-            String userId = jwtUtil.getUserId(token); // 토큰에서 userId 추출
-            FriendResponseDTO response = friendService.addFriend(userId, friendRequestDTO.getFriendId());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+        String userId = jwtUtil.getUserId(token); // 토큰에서 userId 추출
+        FriendResponseDTO response = friendService.addFriend(userId, friendRequestDTO.getFriendId());
+        return ResponseEntity.ok(response);
+
     }
 
     // 친구 상태 확인하는 api

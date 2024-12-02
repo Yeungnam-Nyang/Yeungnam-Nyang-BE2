@@ -13,6 +13,8 @@ public interface PostService {
     //post 작성하기
     Long writePost(PostRequestDTO postRequestDTO, List<MultipartFile> files, String token) throws IOException;
 
+    void updatePost(Long postId, PostRequestDTO postRequestDTO, List<MultipartFile> files, String token);
+
     //New Post 반환
     PostResponseDTO getNewPost(String token);
 
