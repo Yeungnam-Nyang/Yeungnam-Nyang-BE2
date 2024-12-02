@@ -3,6 +3,7 @@ package com.example.YNN.controller;
 import com.example.YNN.DTO.FriendRequestDTO;
 import com.example.YNN.DTO.FriendResponseDTO;
 import com.example.YNN.Enums.FriendRequestStatus;
+import com.example.YNN.error.CustomException;
 import com.example.YNN.service.FriendService;
 import com.example.YNN.util.JwtUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -113,5 +114,17 @@ public class FriendController {
 
         List<FriendResponseDTO> sentRequests = friendService.getSentFriendRequests(userId);
         return ResponseEntity.ok(sentRequests);
+    }
+
+    @GetMapping("/api/friend/profile")
+    public ResponseEntity<?> getFriendProfile(@RequestParam("friendId") String friendId,@RequestHeader("Authorization")String token){
+        if(!jwtUtil.validationToken(jwtUtil.getAccessToken(token))){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+       try {
+           return ResponseEntity.ok(friendService.getFriendProfile(friendId));
+       }catch (Exception e){
+           return ResponseEntity.badRequest().body(null);
+       }
     }
 }
