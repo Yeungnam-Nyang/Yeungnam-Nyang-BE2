@@ -168,6 +168,7 @@ public class FriendServiceImpl implements FriendService {
         User friend = userRepository.findByUserId(friendId);
         if(friend==null){
             //커스텀 예외처리
+            throw new CustomException(ErrorCode.NOT_EXITS_USER, ErrorCode.NOT_EXITS_USER.getMessage());
         }
         String friendImageUrl = (friend.getProfileImage() == null || friend.getProfileImage().getProfileURL() == null)
                 ? "null"
