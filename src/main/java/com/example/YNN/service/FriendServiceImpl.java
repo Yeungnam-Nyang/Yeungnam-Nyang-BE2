@@ -3,6 +3,8 @@ package com.example.YNN.service;
 import com.example.YNN.DTO.FriendProfileDTO;
 import com.example.YNN.DTO.FriendResponseDTO;
 import com.example.YNN.Enums.FriendRequestStatus;
+import com.example.YNN.constants.ErrorCode;
+import com.example.YNN.error.CustomException;
 import com.example.YNN.model.Friend;
 import com.example.YNN.model.User;
 import com.example.YNN.repository.FriendRepository;
@@ -29,20 +31,25 @@ public class FriendServiceImpl implements FriendService {
     @Transactional
     public FriendResponseDTO addFriend(String userId, String friendId) { // 여기서 토큰은 로그인 한 유저의 token임!
         if (userId.equals(friendId)) {
-            throw new IllegalArgumentException("자기 자신에게 친구 요청을 보낼 수 없습니다.");
+            throw new CustomException(ErrorCode.NOT_INPUT_MY_USER_ID,ErrorCode.NOT_INPUT_MY_USER_ID.getMessage());
         }
 
         User user = userRepository.findByUserId(userId);
         if (user == null) {
-            throw new IllegalArgumentException("로그인한 유저가 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.NOT_EXITS_USER,ErrorCode.NOT_EXITS_USER.getMessage());
         }
 
         User friendUser = userRepository.findByUserId(friendId);
         if (friendUser == null) {
-            throw new IllegalArgumentException("해당 유저는 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.NOT_EXITS_USER,ErrorCode.NOT_EXITS_USER.getMessage());
         }
         // 이미 존재하는 친구 요청 조회 (거절된 상태 포함)
         Friend existingFriend = friendRepository.findByUser_UserIdAndFriendId(userId, friendId);
+
+        //이미 친구인 경우
+        if(existingFriend.getStatus().equals(FriendRequestStatus.ACCEPTED)){
+            throw new CustomException(ErrorCode.EXITS_FRIENDS_USER_ID,ErrorCode.EXITS_FRIENDS_USER_ID.getMessage());
+        }
 
         // 요청이 이미 존재하고, 상태가 거절된 경우 요청 상태를 다시 REQUESTED로 변경
         if (existingFriend != null) {
