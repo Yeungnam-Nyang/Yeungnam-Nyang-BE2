@@ -1,5 +1,6 @@
 package com.example.YNN.service;
 
+import com.example.YNN.DTO.FriendProfileDTO;
 import com.example.YNN.DTO.FriendResponseDTO;
 import com.example.YNN.Enums.FriendRequestStatus;
 
@@ -25,4 +26,7 @@ public interface FriendService {
 
     // 친구 요청 목록 조회
     List<FriendResponseDTO> getSentFriendRequests(String userId);
+
+    //친구 프로필 조회
+    FriendProfileDTO getFriendProfile(String friendId);
 }

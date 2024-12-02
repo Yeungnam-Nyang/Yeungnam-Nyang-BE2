@@ -1,10 +1,12 @@
 package com.example.YNN.service;
 
+import com.example.YNN.DTO.FriendProfileDTO;
 import com.example.YNN.DTO.FriendResponseDTO;
 import com.example.YNN.Enums.FriendRequestStatus;
 import com.example.YNN.model.Friend;
 import com.example.YNN.model.User;
 import com.example.YNN.repository.FriendRepository;
+import com.example.YNN.repository.PostRepository;
 import com.example.YNN.repository.UserRepository;
 import com.example.YNN.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class FriendServiceImpl implements FriendService {
 
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -151,4 +154,25 @@ public class FriendServiceImpl implements FriendService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public FriendProfileDTO getFriendProfile(String friendId) {
+        User friend = userRepository.findByUserId(friendId);
+        if(friend==null){
+            //커스텀 예외처리
+        }
+        String friendImageUrl = (friend.getProfileImage() == null || friend.getProfileImage().getProfileURL() == null)
+                ? "null"
+                : friend.getProfileImage().getProfileURL();
+        return FriendProfileDTO
+                .builder()
+                .name(friend.getStudent().getStudentName())
+                .profileUrl(friendImageUrl)
+                .postAmount(postRepository.getPostAmount(friendId))
+                .departmentName(friend.getStudent().getDepartmentName())
+                .schoolName(friend.getStudent().getSchoolName())
+                .build();
+    }
+
 }
