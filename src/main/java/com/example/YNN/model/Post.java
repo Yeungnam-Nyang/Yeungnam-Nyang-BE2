@@ -71,4 +71,9 @@ public class Post {
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<Comment> comments=new ArrayList<>();
 
+    public void updatePostDetails(String content, String catName) {
+        this.content = content;
+        this.catName = catName;
+    }
+
 }

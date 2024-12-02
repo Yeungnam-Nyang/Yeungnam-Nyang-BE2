@@ -27,7 +27,6 @@ import java.util.UUID;
 public class PostServiceImpl implements PostService{
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-    private final PostPictureRepository postImageRepository;
     private final LocationRepository locationRepository;
     private final CatMapRepository catMapRepository;
     private final PostRepository postRepository;
@@ -84,7 +83,7 @@ public class PostServiceImpl implements PostService{
                         .post(post)
                         .build();
 
-                postImageRepository.save(photo);
+                postPictureRepository.save(photo);
 
             }
 
@@ -92,8 +91,67 @@ public class PostServiceImpl implements PostService{
         //성공시 작성한 게시물 번호 반환
         return post.getPostId();
     }
-    //최신 게시물 불러오기
 
+    // 게시물 수정 메서드
+    @Override
+    @Transactional
+    public void updatePost(Long postId, PostRequestDTO postRequestDTO, List<MultipartFile> files, String token) {
+        String userId = jwtUtil.getUserId(token);
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new IllegalStateException("유저가 존재하지 않습니다.");
+        }
+
+        // 2. 게시물 확인 및 권한 검증
+        Post existingPost = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalStateException("존재하지 않는 게시물입니다."));
+        if (!existingPost.getUser().getUserId().equals(userId)) {
+            throw new IllegalStateException("게시물을 수정할 권한이 없습니다."); // 작성한 유저의 한해서 수정 가능
+        }
+
+        // 위치 정보 업데이트
+        Location updatedLocation = locationRepository.findByLatitudeAndLongitude(
+                        postRequestDTO.getLatitude(),
+                        postRequestDTO.getLongitude())
+                .orElseGet(() -> Location.builder()
+                        .latitude(postRequestDTO.getLatitude())
+                        .longitude(postRequestDTO.getLongitude())
+                        .address(postRequestDTO.getAddress())
+                        .time(LocalTime.now())
+                        .build());
+        locationRepository.save(updatedLocation);
+
+        // 기존 게시물 업데이트
+        existingPost.updatePostDetails(
+                postRequestDTO.getContent(),
+                postRequestDTO.getCatName()
+        );
+
+        // 위치 정보 연동 (Builder 패턴을 통해 위치 정보 포함)
+        CatMap existingCatMap = catMapRepository.findByPostPostId(postId);
+        if (existingCatMap != null) {
+            existingCatMap = existingCatMap.toBuilder()
+                    .location(updatedLocation)
+                    .build();
+            catMapRepository.save(existingCatMap);
+        }
+
+        postRepository.save(existingPost);
+
+        // 새 이미지 업로드 및 저장
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                String fileUrl = s3Service.uploadFile(file, "posts"); // S3에 업로드
+                List<Picture> existingPictures = postPictureRepository.findByPost_PostId(postId); // 기존 이미지 조회
+                Picture existingPicture = existingPictures.get(0);
+                postPictureRepository.save(existingPicture.toBuilder()
+                        .pictureUrl(fileUrl)
+                        .build());
+            }
+        }
+    }
+
+    //최신 게시물 불러오기
     @Override
     public PostResponseDTO getNewPost(String token) {
 
