@@ -2,6 +2,7 @@ package com.example.YNN.repository;
 
 import com.example.YNN.model.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,5 +20,11 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 
     //postId로 게시물 찾기
     Post findByPostId(Long postId);
+
+    //포스트 개수 반환
+    @Query("select count (*) "+
+            "from Post p "+
+            "where p.user.userId = :userId")
+    int getPostAmount(String userId);
 
 }
