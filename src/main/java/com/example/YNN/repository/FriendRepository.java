@@ -13,8 +13,6 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
 
     List<Friend> findByUser_UserIdAndStatus(String userId, FriendRequestStatus status);
 
-//    @Transactional(readOnly = true)
-//    List<Friend> findByUser_UserId(String userId);
 
     List<Friend> findByUser_UserIdAndStatusIn(String userId, List<FriendRequestStatus> statuses);
 }

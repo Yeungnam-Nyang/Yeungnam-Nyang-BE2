@@ -45,34 +45,38 @@ public class FriendServiceImpl implements FriendService {
         }
         // 이미 존재하는 친구 요청 조회 (거절된 상태 포함)
         Friend existingFriend = friendRepository.findByUser_UserIdAndFriendId(userId, friendId);
+        Friend existingUser = friendRepository.findByUser_UserIdAndFriendId(friendId, userId);
 
-        //이미 친구인 경우
-        if(existingFriend.getStatus().equals(FriendRequestStatus.ACCEPTED)){
-            throw new CustomException(ErrorCode.EXITS_FRIENDS_USER_ID,ErrorCode.EXITS_FRIENDS_USER_ID.getMessage());
+        // 친구 상태 확인
+        if ((existingFriend != null && existingFriend.getStatus() == FriendRequestStatus.ACCEPTED) ||
+                (existingUser != null && existingUser.getStatus() == FriendRequestStatus.ACCEPTED)) {
+            throw new CustomException(ErrorCode.EXITS_FRIENDS_USER_ID, ErrorCode.EXITS_FRIENDS_USER_ID.getMessage());
         }
+        //* 양방향 관계 확인해야함
 
-        // 요청이 이미 존재하고, 상태가 거절된 경우 요청 상태를 다시 REQUESTED로 변경
+        // 기존 요청이 존재하는 경우
         if (existingFriend != null) {
-            if (existingFriend.getStatus() == FriendRequestStatus.REJECTED) {
-                Friend updatedFriend = Friend.builder()
-                        .id(existingFriend.getId())                // 기존 ID 유지
-                        .user(existingFriend.getUser())            // 기존 User 유지
-                        .friendId(existingFriend.getFriendId())    // 기존 friendId 유지
-                        .status(FriendRequestStatus.REQUESTED)     // 상태를 REQUESTED로 변경
+            if (existingFriend.getStatus() == FriendRequestStatus.REJECTED) { // 이미 친구 요청을 거절했으면
+                Friend updatedFriendRequest = Friend.builder()
+                        .id(existingFriend.getId())
+                        .user(existingFriend.getUser())
+                        .friendId(existingFriend.getFriendId())
+                        .status(FriendRequestStatus.REQUESTED) // 상태를 REQUESTED로 변경
                         .build();
-                friendRepository.save(updatedFriend);
+                friendRepository.save(updatedFriendRequest);
                 return new FriendResponseDTO("친구 요청을 다시 보냈습니다.", FriendRequestStatus.REQUESTED, friendId);
             }
             return new FriendResponseDTO("이미 친구 요청을 보냈습니다.", existingFriend.getStatus(), friendId);
         }
 
-        // 새로운 친구 요청 생성
+        // 새로운 요청 생성
         Friend friendRequest = Friend.builder()
-                .user(userRepository.findByUserId(userId)) //** 수정 후 여기서의 userId는 token으로 추출한 userId임 **//
+                .user(user)
                 .friendId(friendId)
                 .status(FriendRequestStatus.REQUESTED)
                 .build();
         friendRepository.save(friendRequest);
+
         return new FriendResponseDTO("친구 요청을 보냈습니다.", friendRequest.getStatus(), friendId);
     }
 
