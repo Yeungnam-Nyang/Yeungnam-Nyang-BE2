@@ -282,7 +282,7 @@ public class PostServiceImpl implements PostService{
                 .likeCnt(findPost.getLikeCnt())
                 .userId(findPost.getUser().getUserId())
                 .catName(findPost.getCatName())
-
+                .catStopWatch(String.valueOf(findPost.getCatStopWatch()))
                 .address(address)
                 .likedByUser(likedByUser)
                 //댓글은 보류
