@@ -116,6 +116,19 @@ public class FriendController {
         return ResponseEntity.ok(sentRequests);
     }
 
+    // 친구 요청 받은 목록 조회 API
+    @GetMapping("/api/friend/received-requests")
+    public ResponseEntity<List<FriendResponseDTO>> getReceivedFriendRequests(@RequestHeader("Authorization") String token) {
+        if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        String userId = jwtUtil.getUserId(token);
+
+        List<FriendResponseDTO> receivedRequests = friendService.getReceivedFriendRequests(userId);
+        return ResponseEntity.ok(receivedRequests);
+    }
+
     @GetMapping("/api/friend/profile")
     public ResponseEntity<?> getFriendProfile(@RequestParam("friendId") String friendId,@RequestHeader("Authorization")String token){
         if(!jwtUtil.validationToken(jwtUtil.getAccessToken(token))){
