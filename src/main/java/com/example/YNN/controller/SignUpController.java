@@ -18,7 +18,7 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-@Tag(name = "회원가입", description = "회원 가입 API")
+@Tag(name = "회원가입", description = "< 회원 가입 > API")
 public class SignUpController {
     private final SignUpServiceImpl signUpServiceImpl;
     private final SmsServiceImpl smsService;
@@ -43,7 +43,7 @@ public class SignUpController {
     @GetMapping("/api/signup/checkId")
     @Operation(
             summary = "아이디 중복 체크",
-            description = "회원 아이디 중복 처리 사용예시(http://localhost:8080/api/signup/checkId?userId=[유저 아이디] 파라미터 형식",
+            description = "회원 아이디 중복 처리 사용예시(https://localhost:443/api/signup/checkId?userId=[유저 아이디] 파라미터 형식",
             responses = {
                     @ApiResponse(responseCode = "200", description = "사용가능한 아이디 입니다."),
                     @ApiResponse(responseCode = "400", description = "중복된 아이디 입니다.")

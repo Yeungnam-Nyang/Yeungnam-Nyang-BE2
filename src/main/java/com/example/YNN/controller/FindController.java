@@ -20,12 +20,12 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-@Tag(name = "아이디 및 비밀번호 찾기",description = "아이디 및 비밀번호 찾기 API")
+@Tag(name = "아이디 및 비밀번호 찾기",description = "< 아이디 / 비밀번호 찾기 > API")
 public class FindController {
     private final FindServiceImpl findService;
     private final SmsServiceImpl smsService;
 
-    //유저 ID 찾기
+    /** 유저 ID 찾기 **/
     @PostMapping("/api/find/id")
     @Operation(
             summary = "ID찾기",

@@ -3,7 +3,6 @@ package com.example.YNN.controller;
 import com.example.YNN.DTO.FriendRequestDTO;
 import com.example.YNN.DTO.FriendResponseDTO;
 import com.example.YNN.Enums.FriendRequestStatus;
-import com.example.YNN.error.CustomException;
 import com.example.YNN.service.FriendService;
 import com.example.YNN.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

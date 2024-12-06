@@ -5,7 +5,8 @@ import com.example.YNN.DTO.PostResponseDTO;
 import com.example.YNN.error.StateResponse;
 import com.example.YNN.service.PostServiceImpl;
 import com.example.YNN.util.JwtUtil;
-import io.lettuce.core.dynamic.annotation.Param;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,12 +20,20 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@Tag(name = "게시물", description = "게시물 API")
+@Tag(name = "게시물", description = "< 게시물 > API")
 public class PostController {
     private final PostServiceImpl postService;
     private final JwtUtil jwtUtil;
 
-    //게시물 작성
+    /** 게시물 작성 API **/
+    @Operation(
+            summary = "게시물을 작성하는 API 입니다.",
+            description = "게시물 작성",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "게시물 작성 완료"),
+                    @ApiResponse(responseCode = "400", description = "오류")
+            }
+    )
     @PostMapping("/api/post/write")
     ResponseEntity<String> write(@RequestPart PostRequestDTO postRequestDTO,
                                  @RequestPart(value = "files") List<MultipartFile> files,
@@ -41,7 +50,15 @@ public class PostController {
         }
     }
 
-    // 게시물 수정 API
+    /** 게시물 수정 API **/
+    @Operation(
+            summary = "게시물 수정 API 입니다.",
+            description = "게시물 수정",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "게시물 수정 완료"),
+                    @ApiResponse(responseCode = "400", description = "오류")
+            }
+    )
     @PutMapping("/api/post/edit/{postId}")
     ResponseEntity<StateResponse> updatePost( // StateResponse로 상태 처리
             @RequestHeader("Authorization") String token, // 토큰값
@@ -69,7 +86,15 @@ public class PostController {
         }
     }
 
-    //최신 게시물 불러오기
+    /** 최신 게시물 불러오기 API **/
+    @Operation(
+            summary = "최신 게시물을 불러오는 API 입니다.",
+            description = "최신 게시물",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "최신 게시물 불러오기 성공"),
+                    @ApiResponse(responseCode = "400", description = "오류")
+            }
+    )
     @GetMapping("/api/post/new")
     ResponseEntity<PostResponseDTO> getNewPost(@RequestHeader("Authorization") String token) {
 
@@ -87,9 +112,16 @@ public class PostController {
         }
     }
 
-    //인기 게시물 불러오가
+    /** 인기 게시물 불러오기 API **/
+    @Operation(
+            summary = "인기 게시물을 불러오는 API 입니다.",
+            description = "인기 게시물",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "인기 게시물 불러오기 성공"),
+                    @ApiResponse(responseCode = "400", description = "오류")
+            }
+    )
     @GetMapping("/api/post/popular")
-
     ResponseEntity<PostResponseDTO> getPopularPost(@RequestHeader("Authorization") String token){
 
         //jwt토큰 유효성 검사
@@ -105,7 +137,15 @@ public class PostController {
         }
     }
 
-    //게시물 삭제
+    /** 게시물 삭제 API **/
+    @Operation(
+            summary = "게시물을 삭제하는 API 입니다.",
+            description = "게시물 삭제",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "게시물 삭제 성공"),
+                    @ApiResponse(responseCode = "400", description = "오류")
+            }
+    )
     @DeleteMapping("/api/post/{postId}")
     ResponseEntity<StateResponse> deletePost(@RequestHeader("Authorization") String token, @PathVariable("postId") Long postId) {
         //jwt토큰 검사
@@ -125,7 +165,15 @@ public class PostController {
 
     }
 
-    //내 게시물 확인
+    /** 내 게시물 확인 API **/
+    @Operation(
+            summary = "내 게시물을 확인하는 API 입니다.",
+            description = "내 게시물 확인",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "내 게시물 확인 성공"),
+                    @ApiResponse(responseCode = "400", description = "오류")
+            }
+    )
     @GetMapping("/api/post/my/{postId}")
     ResponseEntity<StateResponse> isMyPost(@RequestHeader("Authorization") String token, @PathVariable("postId") Long postId) {
         //jwt토큰 검사
@@ -142,7 +190,15 @@ public class PostController {
         return ResponseEntity.badRequest().body(new StateResponse("400", "FALSE"));
     }
 
-    //게시물 상세보기
+    /** 게시물 상세보기 API **/
+    @Operation(
+            summary = "게시물 상세보기 API 입니다.",
+            description = "게시물 상세보기",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "게시물 상세보기 성공"),
+                    @ApiResponse(responseCode = "400", description = "오류")
+            }
+    )
     @GetMapping("/api/post/{postId}")
     ResponseEntity<PostResponseDTO> postDetail(@RequestHeader("Authorization") String token, @PathVariable("postId") Long postId){
         //jwt토큰 검사
@@ -158,7 +214,15 @@ public class PostController {
         }
     }
 
-    //게시물 갯수 리턴
+    /** 게시물 갯수 리턴 API **/
+    @Operation(
+            summary = "게시물 개수를 반환하는 API 입니다.",
+            description = "게시물 개수 반환",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "게시물 개수 반환 성공"),
+                    @ApiResponse(responseCode = "400", description = "오류")
+            }
+    )
     @GetMapping("/api/post/count/{userId}")
     ResponseEntity<StateResponse> getNumOfPosts(@RequestHeader("Authorization")String token,@PathVariable("userId")String userId){
         //jwt토큰 검사
@@ -171,7 +235,15 @@ public class PostController {
         return ResponseEntity.ok(new StateResponse("200",String.valueOf(num)));
     }
 
-    //고양이 밥주기
+    /** 고양이 밥주기 API **/
+    @Operation(
+            summary = "고양이 밥주는 API 입니다.",
+            description = "고양이 밥주기",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "고양이 밥주기 성공"),
+                    @ApiResponse(responseCode = "400", description = "오류")
+            }
+    )
     @PutMapping("/api/post/catfood/{postId}")
     ResponseEntity<?> feedingCat(@RequestHeader("Authorization")String token,@PathVariable("postId")Long postId){
         //jwt토큰 검사
