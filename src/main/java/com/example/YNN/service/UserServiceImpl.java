@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUserId(userId);
         Profile profile = profileRepository.findByUser(user).orElse(null);
         // 기본 프로필 이미지 URL : 내 S3 버킷의 /test 디렉토리에 세팅해둠.
-        String defaultProfileUrl = "https://ynn-server-bucket0425.s3.ap-northeast-2.amazonaws.com/test/ae464445-d9ea-4a05-94c2-5737ed85c9ee_%ED%86%A0%EB%B2%A4%EB%A8%B8%EB%A6%AC.png";
+        String defaultProfileUrl = "https://ynn-server-bucket0425.s3.ap-northeast-2.amazonaws.com/test/free-icon-profile-7263996.png";
 
         return UserProfileDTO.builder()
                 .userId(user.getUserId())

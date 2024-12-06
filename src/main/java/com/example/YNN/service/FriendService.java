@@ -24,8 +24,11 @@ public interface FriendService {
     // 친구 요청 취소
     FriendResponseDTO cancelFriendRequest(String userId, String friendId);
 
-    // 친구 요청 목록 조회
+    // 친구 요청 보낸 목록 조회
     List<FriendResponseDTO> getSentFriendRequests(String userId);
+
+    // 친구 요청 받은 목록 조회
+    List<FriendResponseDTO> getReceivedFriendRequests(String userId);
 
     //친구 프로필 조회
     FriendProfileDTO getFriendProfile(String friendId);

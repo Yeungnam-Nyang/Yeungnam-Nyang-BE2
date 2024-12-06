@@ -138,6 +138,10 @@ public class FriendServiceImpl implements FriendService {
     @Override
     @Transactional(readOnly = true)
     public List<FriendResponseDTO> getFriendsList(String userId) {
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.NOT_EXITS_USER, ErrorCode.NOT_EXITS_USER.getMessage()); // 예외 처리
+        }
         // ACCEPTED 상태인 친구만 조회
         List<Friend> friends = friendRepository.findByUser_UserIdAndStatus(userId, FriendRequestStatus.ACCEPTED);
 
@@ -152,7 +156,11 @@ public class FriendServiceImpl implements FriendService {
     @Override
     @Transactional(readOnly = true)
     public List<FriendResponseDTO> getSentFriendRequests(String userId) {
-        // REQUESTED 상태인 친구 요청 목록 조회
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.NOT_EXITS_USER, ErrorCode.NOT_EXITS_USER.getMessage()); // 예외 처리
+        }
+        // REQUESTED 상태인 목록 조회
         List<FriendRequestStatus> statuses = List.of(FriendRequestStatus.REQUESTED);
 
         List<Friend> sentRequests = friendRepository.findByUser_UserIdAndStatusIn(userId, statuses);
@@ -162,6 +170,26 @@ public class FriendServiceImpl implements FriendService {
                         .message("친구 요청을 보냈습니다.")
                         .status(friend.getStatus())
                         .friendId(friend.getFriendId())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FriendResponseDTO> getReceivedFriendRequests(String userId) {
+        User user = userRepository.findByUserId(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.NOT_EXITS_USER, ErrorCode.NOT_EXITS_USER.getMessage()); // 예외 처리
+        }
+        // 친구 요청을 받은 목록 조회
+        List<Friend> receivedRequests = friendRepository.findAllByFriendIdAndStatus(userId, FriendRequestStatus.REQUESTED);
+
+        // Friend 엔터티를 FriendResponseDTO로 변환
+        return receivedRequests.stream()
+                .map(request -> FriendResponseDTO.builder()
+                        .message("친구 요청을 받았습니다.")
+                        .status(request.getStatus())
+                        .friendId(request.getUser().getUserId())
                         .build())
                 .collect(Collectors.toList());
     }
