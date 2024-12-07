@@ -5,21 +5,16 @@ import com.example.YNN.model.*;
 import com.example.YNN.repository.*;
 import com.example.YNN.service.s3.S3Service;
 import com.example.YNN.util.JwtUtil;
-import jdk.dynalink.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -153,37 +148,34 @@ public class PostServiceImpl implements PostService{
 
     //최신 게시물 불러오기
     @Override
-    public PostResponseDTO getNewPost(String token) {
-
-        List<Post> postList=postRepository.findAllByOrderByCreatedAtDesc();
-        //글이 없는 경우
-        if(postList.isEmpty()){
-            return PostResponseDTO
-                    .builder()
-                    .message("NULL")
-                    .build();
+    public List<PostResponseDTO> getNewPost(String token) {
+        List<Post> postList = postRepository.findAllByOrderByCreatedAtDesc();
+        // 게시물이 없는 경우 빈 리스트 반환
+        if (postList.isEmpty()) {
+            return Collections.emptyList();
         }
-        //게
-        Post newPost= postList.get(0);
-
-        //사진가져오기
-        List<Picture> pictures=postPictureRepository.findByPost_PostId(newPost.getPostId());
-        List<String> pictureUrls=pictures.stream()
-                .map(Picture::getPictureUrl)
-                .toList();
-
-
         // 사용자 정보 가져오기
         String userId = jwtUtil.getUserId(token);
         User user = userRepository.findByUserId(userId);
         if (user == null) {
             throw new RuntimeException("사용자를 찾을 수 없습니다.");
         }
+        // 최신순으로 정렬된 리스트 중 제일 최근 게시물 하나를 가져옴
+        Post newPost= postList.get(0);
+        // 게시물의 사진 가져오기
+        List<Picture> pictures = postPictureRepository.findByPost_PostId(newPost.getPostId());
+        List<String> pictureUrls = pictures.stream()
+                .map(Picture::getPictureUrl)
+                .toList();
+        // 좋아요 여부 확인
         boolean likedByUser = likeRepository.findByPostAndUser(newPost, user).isPresent();
-
-
-        //DTO생성
-        PostResponseDTO postResponseDTO= PostResponseDTO.builder()
+        // 프로필 URL 가져오기
+        String profileURL = newPost.getUser().getProfileImage() != null
+                ? newPost.getUser().getProfileImage().getProfileURL()
+                : "null";
+        // 프로필 값이 null (기본 프사 상태) 이면 문자열 null로 바꿔서 전송
+        // DTO 생성
+        PostResponseDTO postResponseDTO = PostResponseDTO.builder()
                 .postId(newPost.getPostId())
                 .postDate(String.valueOf(newPost.getCreatedAt()))
                 .likeCnt(newPost.getLikeCnt())
@@ -192,44 +184,42 @@ public class PostServiceImpl implements PostService{
                 .userId(newPost.getUser().getUserId())
                 .catName(newPost.getCatName())
                 .pictureUrl(pictureUrls)
-                .postId(newPost.getPostId())
+                .profileUrl(profileURL) // 게시물 작성자의 프로필 URL
                 .likedByUser(likedByUser)
                 .build();
-
-        //제이슨 형식 DTO리턴
-        return postResponseDTO;
+        // 단일 DTO를 리스트로 감싸 반환
+        return List.of(postResponseDTO);
     }
+
     //인기 게시물 가져오기
-
     @Override
-    public PostResponseDTO getPopular(String token) {
+    public List<PostResponseDTO> getPopular(String token) {
         List<Post> postList=postRepository.findAllByOrderByLikeCntDesc();
-        //글이 없는 경우
-        if(postList.isEmpty()){
-            return PostResponseDTO
-                    .builder()
-                    .message("NULL")
-                    .build();
+        // 게시물이 없는 경우 빈 리스트 반환
+        if (postList.isEmpty()) {
+            return Collections.emptyList();
         }
-        Post popularPost= postList.get(0);
-
-        //사진가져오기
-        List<Picture> pictures=postPictureRepository.findByPost_PostId(popularPost.getPostId());
-        List<String> pictureUrls=pictures.stream()
-                .map(Picture::getPictureUrl)
-                .toList();
-
+        // 사용자 정보 가져오기
         String userId = jwtUtil.getUserId(token);
         User user = userRepository.findByUserId(userId);
         if (user == null) {
             throw new RuntimeException("사용자를 찾을 수 없습니다.");
         }
-
+        // 좋아요 수로 정렬된 게시물 중 가장 많은 좋아요 수를 가진 게시물 가져오기
+        Post popularPost= postList.get(0);
+        // 사진가져오기
+        List<Picture> pictures=postPictureRepository.findByPost_PostId(popularPost.getPostId());
+        List<String> pictureUrls=pictures.stream()
+                .map(Picture::getPictureUrl)
+                .toList();
         // 사용자가 해당 게시물에 좋아요를 눌렀는지 확인
         boolean likedByUser = likeRepository.findByPostAndUser(popularPost, user).isPresent();
-
-
-        //DTO생성
+        // 프로필 URL 가져오기
+        String profileURL = popularPost.getUser().getProfileImage() != null
+                ? popularPost.getUser().getProfileImage().getProfileURL()
+                : "null";
+        // 프로필 값이 null (기본 프사 상태) 이면 문자열 null로 바꿔서 전송
+        // DTO생성
         PostResponseDTO postResponseDTO= PostResponseDTO.builder()
                 .postId(popularPost.getPostId())
                 .postDate(String.valueOf(popularPost.getCreatedAt()))
@@ -239,46 +229,49 @@ public class PostServiceImpl implements PostService{
                 .userId(popularPost.getUser().getUserId())
                 .catName(popularPost.getCatName())
                 .pictureUrl(pictureUrls)
+                .profileUrl(profileURL)
                 .postId(popularPost.getPostId())
                 .likedByUser(likedByUser)
                 .build();
 
         //제이슨 형식 DTO리턴
-        return postResponseDTO;
+        return List.of(postResponseDTO);
 
     }
 
     // 게시물 상세보기
     @Override
 
-    public PostResponseDTO getDetail(Long postId,String token) {
+    public List<PostResponseDTO> getDetail(Long postId,String token) {
         Post findPost=postRepository.findByPostId(postId);
-        //사진 정보 불러오기
-        List<Picture> pictures=postPictureRepository.findByPost_PostId(findPost.getPostId());
-        List<String> pictureUrls=pictures.stream()
-                .map(Picture::getPictureUrl)
-                .toList();
-
-
-        //위치정보
-        String address=locationRepository.findAddressByPostId(findPost.getPostId());
-
         // 사용자 정보 가져오기
         String userId = jwtUtil.getUserId(token);
         User user = userRepository.findByUserId(userId);
         if (user == null) {
             throw new RuntimeException("사용자를 찾을 수 없습니다.");
         }
+        // 사진 정보 불러오기
+        List<Picture> pictures=postPictureRepository.findByPost_PostId(findPost.getPostId());
+        List<String> pictureUrls=pictures.stream()
+                .map(Picture::getPictureUrl)
+                .toList();
+        // 위치정보
+        String address=locationRepository.findAddressByPostId(findPost.getPostId());
+        // 좋아요 여부
         boolean likedByUser = likeRepository.findByPostAndUser(findPost, user).isPresent();
-
-
-        //반환DTO생성
+        // 프로필 URL 가져오기
+        String profileURL = findPost.getUser().getProfileImage() != null
+                ? findPost.getUser().getProfileImage().getProfileURL()
+                : "null";
+        // 프로필 값이 null (기본 프사 상태) 이면 문자열 null로 바꿔서 전송
+        // 반환DTO생성
         PostResponseDTO postResponseDTO=PostResponseDTO.builder()
                 .commentCnt((long) findPost.getComments().size())
                 .postId(findPost.getPostId())
                 .content(findPost.getContent())
                 .postDate(String.valueOf(findPost.getCreatedAt()))
                 .pictureUrl(pictureUrls)
+                .profileUrl(profileURL)
                 .likeCnt(findPost.getLikeCnt())
                 .userId(findPost.getUser().getUserId())
                 .catName(findPost.getCatName())
@@ -288,7 +281,7 @@ public class PostServiceImpl implements PostService{
                 //댓글은 보류
                 .build();
 
-        return postResponseDTO;
+        return List.of(postResponseDTO);
     }
 
     @Override
