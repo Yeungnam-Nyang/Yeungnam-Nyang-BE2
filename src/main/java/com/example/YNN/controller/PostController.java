@@ -2,6 +2,7 @@ package com.example.YNN.controller;
 
 import com.example.YNN.DTO.PostRequestDTO;
 import com.example.YNN.DTO.PostResponseDTO;
+import com.example.YNN.constants.ErrorCode;
 import com.example.YNN.error.StateResponse;
 import com.example.YNN.service.PostServiceImpl;
 import com.example.YNN.util.JwtUtil;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -96,13 +98,13 @@ public class PostController {
             }
     )
     @GetMapping("/api/post/new")
-    ResponseEntity<PostResponseDTO> getNewPost(@RequestHeader("Authorization") String token) {
+    ResponseEntity<?> getNewPost(@RequestHeader("Authorization") String token) {
 
         //jwt토큰 유효성 검사
         if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new PostResponseDTO("유효하지 않은 토큰"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("유효하지 않은 토큰입니다.");
         }
-
         try {
             PostResponseDTO postResponseDTO = postService.getNewPost(token);
             return ResponseEntity.ok(postResponseDTO);
@@ -122,11 +124,11 @@ public class PostController {
             }
     )
     @GetMapping("/api/post/popular")
-    ResponseEntity<PostResponseDTO> getPopularPost(@RequestHeader("Authorization") String token){
-
+    ResponseEntity<?> getPopularPost(@RequestHeader("Authorization") String token){
         //jwt토큰 유효성 검사
         if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new PostResponseDTO("유효하지 않은 토큰"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("유효하지 않은 토큰입니다.");
         }
         try {
             PostResponseDTO postResponseDTO = postService.getPopular(token);
@@ -200,16 +202,18 @@ public class PostController {
             }
     )
     @GetMapping("/api/post/{postId}")
-    ResponseEntity<PostResponseDTO> postDetail(@RequestHeader("Authorization") String token, @PathVariable("postId") Long postId){
+    ResponseEntity<?> postDetail(@RequestHeader("Authorization") String token, @PathVariable("postId") Long postId){
         //jwt토큰 검사
         if (!jwtUtil.validationToken(jwtUtil.getAccessToken(token))) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new PostResponseDTO("유효하지 않은 토큰"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new StateResponse("401", "토큰 오류")
+            );
         }
         try{
-           PostResponseDTO postResponseDTO= postService.getDetail(postId,token);
+            PostResponseDTO postResponseDTO = postService.getDetail(postId,token);
            return ResponseEntity.ok().body(postResponseDTO);
         }catch (Exception e){
-            PostResponseDTO emptyResponseDTO=new PostResponseDTO();
+            PostResponseDTO emptyResponseDTO = new PostResponseDTO();
             return ResponseEntity.badRequest().body(emptyResponseDTO);
         }
     }

@@ -69,7 +69,7 @@ public class CommentServiceImpl implements CommentService {
                         .commentDate(comment.getCreatedAt().toString())
                         .userId(comment.getUser().getUserId())
                         .profileUrl(comment.getUser().getProfileImage() != null ?
-                                comment.getUser().getProfileImage().getProfileURL() : null)                        .build())
+                                comment.getUser().getProfileImage().getProfileURL() : "null")                        .build())
                 .toList();
     }
 
