@@ -3,7 +3,7 @@ package com.example.YNN.controller;
 import com.example.YNN.DTO.FriendRequestDTO;
 import com.example.YNN.DTO.FriendResponseDTO;
 import com.example.YNN.Enums.FriendRequestStatus;
-import com.example.YNN.service.FriendService;
+import com.example.YNN.service.FriendServiceImpl;
 import com.example.YNN.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,7 +21,7 @@ import java.util.List;
 @Tag(name = "친구", description = "< 친구 > API")
 public class FriendController {
 
-    private final FriendService friendService;
+    private final FriendServiceImpl friendService;
     private final JwtUtil jwtUtil;
 
     /** 친구 추가 요청하는 API **/

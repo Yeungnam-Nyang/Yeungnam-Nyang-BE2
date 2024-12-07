@@ -12,6 +12,7 @@ import com.example.YNN.repository.PostRepository;
 import com.example.YNN.repository.UserRepository;
 import com.example.YNN.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,11 +65,14 @@ public class FriendServiceImpl implements FriendService {
                         .status(FriendRequestStatus.REQUESTED) // 상태를 REQUESTED로 변경
                         .build();
                 friendRepository.save(updatedFriendRequest);
-                return new FriendResponseDTO("친구 요청을 다시 보냈습니다.", FriendRequestStatus.REQUESTED, friendId);
+                // 친구의 프로필 URL 가져오기
+                String profileURL = getUserProfileUrl(friendId);
+                return new FriendResponseDTO("친구 요청을 다시 보냈습니다.", FriendRequestStatus.REQUESTED, friendId, profileURL);
             }
-            return new FriendResponseDTO("이미 친구 요청을 보냈습니다.", existingFriend.getStatus(), friendId);
+            String profileURL = getUserProfileUrl(friendId);
+            // 친구 요청이 이미 존재하는 경우
+            return new FriendResponseDTO("이미 친구 요청을 보냈습니다.", existingFriend.getStatus(), friendId, profileURL);
         }
-
         // 새로운 요청 생성
         Friend friendRequest = Friend.builder()
                 .user(user)
@@ -77,7 +81,9 @@ public class FriendServiceImpl implements FriendService {
                 .build();
         friendRepository.save(friendRequest);
 
-        return new FriendResponseDTO("친구 요청을 보냈습니다.", friendRequest.getStatus(), friendId);
+        String profileURL = getUserProfileUrl(friendId);
+
+        return new FriendResponseDTO("친구 요청을 보냈습니다.", friendRequest.getStatus(), friendId, profileURL);
     }
 
     @Override
@@ -91,14 +97,17 @@ public class FriendServiceImpl implements FriendService {
 
         if (friendRequestSent != null) {
             // A유저가 B유저에게 보낸 요청이 존재
-            return new FriendResponseDTO("친구 요청을 보냈습니다.", friendRequestSent.getStatus(), friendId);
+            String profileUrl = getUserProfileUrl(friendId);
+            return new FriendResponseDTO("친구 요청을 보냈습니다.", friendRequestSent.getStatus(), friendId, profileUrl);
         } else if (friendRequestReceived != null) {
             // B유저가 A유저에게 보낸 요청이 존재
-            return new FriendResponseDTO("친구 요청을 받았습니다.", friendRequestReceived.getStatus(), userId);
+            String profileUrl = getUserProfileUrl(friendId);
+            return new FriendResponseDTO("친구 요청을 받았습니다.", friendRequestReceived.getStatus(), userId, profileUrl);
         }
-
+        // profileUrl은 요청받은 친구의 url임
+        String profileUrl = getUserProfileUrl(friendId);
         // 요청이 없을 때 처리
-        return new FriendResponseDTO("해당 친구 요청 기록이 없습니다.", null, friendId);
+        return new FriendResponseDTO("해당 친구 요청 기록이 없습니다.", null, friendId, profileUrl);
     }
 
     @Override
@@ -106,7 +115,8 @@ public class FriendServiceImpl implements FriendService {
     public FriendResponseDTO respondToFriendRequest(String userId, String friendId, FriendRequestStatus status) {
         Friend friendRequest = friendRepository.findByUser_UserIdAndFriendId(friendId, userId);
         if (friendRequest == null) {
-            return new FriendResponseDTO("친구 요청이 존재하지 않습니다.", null, friendId);
+            String profileUrl = getUserProfileUrl(friendId);
+            return new FriendResponseDTO("친구 요청이 존재하지 않습니다.", null, friendId, profileUrl);
         }
 
         // 상태를 업데이트한 새로운 Friend 객체를 생성
@@ -116,11 +126,11 @@ public class FriendServiceImpl implements FriendService {
                 .friendId(friendRequest.getFriendId())   // 기존 friendId 유지
                 .status(status)                          // 새로운 상태로 업데이트
                 .build();
-
         // 변경된 객체를 데이터베이스에 저장
         friendRepository.save(updatedFriendRequest);
 
-        return new FriendResponseDTO("친구 요청이 " + status.toString() + "되었습니다.", status, friendId);
+        String profileUrl = getUserProfileUrl(friendId);
+        return new FriendResponseDTO("친구 요청이 " + status.toString() + "되었습니다.", status, friendId, profileUrl);
     }
 
     @Override
@@ -128,11 +138,12 @@ public class FriendServiceImpl implements FriendService {
     public FriendResponseDTO cancelFriendRequest(String userId, String friendId) { // 마찬가지로 token은 로그인 한 유저 토큰임
         Friend friendRequest = friendRepository.findByUser_UserIdAndFriendId(userId, friendId);
         if (friendRequest == null || friendRequest.getStatus() != FriendRequestStatus.REQUESTED) {
-            return new FriendResponseDTO("친구 요청이 없거나 이미 처리되었습니다.", null, friendId);
+            String profileUrl = getUserProfileUrl(friendId);
+            return new FriendResponseDTO("친구 요청이 없거나 이미 처리되었습니다.", null, friendId, profileUrl);
         }
-
+        String profileUrl = getUserProfileUrl(friendId);
         friendRepository.delete(friendRequest);
-        return new FriendResponseDTO("친구 요청이 취소되었습니다.", null, friendId);
+        return new FriendResponseDTO("친구 요청이 취소되었습니다.", null, friendId, profileUrl);
     }
 
     @Override
@@ -146,10 +157,15 @@ public class FriendServiceImpl implements FriendService {
         List<Friend> friends = friendRepository.findByUser_UserIdAndStatus(userId, FriendRequestStatus.ACCEPTED);
 
         return friends.stream()
-                .map(friend -> new FriendResponseDTO(
-                        "친구 상태: " + friend.getStatus().toString(),
-                        friend.getStatus(),
-                        friend.getFriendId())) // 친구 ID도 응답에 포함
+                .map(friend -> {
+                    String profileURL = getUserProfileUrl(friend.getUser().getUserId());
+                    return new FriendResponseDTO(
+                            "친구 상태: " + friend.getStatus().toString(),
+                            friend.getStatus(),
+                            friend.getFriendId(),
+                            profileURL
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
@@ -166,11 +182,15 @@ public class FriendServiceImpl implements FriendService {
         List<Friend> sentRequests = friendRepository.findByUser_UserIdAndStatusIn(userId, statuses);
 
         return sentRequests.stream()
-                .map(friend -> FriendResponseDTO.builder()
-                        .message("친구 요청을 보냈습니다.")
-                        .status(friend.getStatus())
-                        .friendId(friend.getFriendId())
-                        .build())
+                .map(friend -> {
+                    String profileURL = getUserProfileUrl(friend.getFriendId());
+                    return new FriendResponseDTO(
+                            "친구 요청을 보냈습니다.",
+                            friend.getStatus(),
+                            friend.getFriendId(),
+                            profileURL
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
@@ -186,11 +206,15 @@ public class FriendServiceImpl implements FriendService {
 
         // Friend 엔터티를 FriendResponseDTO로 변환
         return receivedRequests.stream()
-                .map(request -> FriendResponseDTO.builder()
-                        .message("친구 요청을 받았습니다.")
-                        .status(request.getStatus())
-                        .friendId(request.getUser().getUserId())
-                        .build())
+                .map(request -> {
+                    String profileURL = getUserProfileUrl(request.getUser().getUserId());
+                    return new FriendResponseDTO(
+                            "친구 요청을 받았습니다.",
+                            request.getStatus(),
+                            request.getUser().getUserId(),
+                            profileURL
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
@@ -213,6 +237,16 @@ public class FriendServiceImpl implements FriendService {
                 .departmentName(friend.getStudent().getDepartmentName())
                 .schoolName(friend.getStudent().getSchoolName())
                 .build();
+    }
+
+
+
+    private String getUserProfileUrl(String userId) {
+        User user = userRepository.findByUserId(userId);
+        if (user == null || user.getProfileImage() == null) {
+            return "null"; // 기본값 처리
+        }
+        return user.getProfileImage().getProfileURL();
     }
 
 }
