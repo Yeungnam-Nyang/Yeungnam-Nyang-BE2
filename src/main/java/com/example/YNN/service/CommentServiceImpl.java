@@ -2,6 +2,8 @@ package com.example.YNN.service;
 
 import com.example.YNN.DTO.CommentRequestDTO;
 import com.example.YNN.DTO.CommentResponseDTO;
+import com.example.YNN.constants.ErrorCode;
+import com.example.YNN.error.CustomException;
 import com.example.YNN.model.Comment;
 import com.example.YNN.model.Post;
 import com.example.YNN.model.User;
@@ -12,6 +14,7 @@ import com.example.YNN.util.JwtUtil;
 import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,14 +65,20 @@ public class CommentServiceImpl implements CommentService {
 
         //** 댓글 조회할 때 "createdAt"을 내림차순으로 정렬(최신순) **//
         List<Comment> comments = commentRepository.findByPost(post); // 댓글 repo에서 post 조회해서 댓글들 다 List로 저장
+
         return comments.stream()
-                .map(comment -> CommentResponseDTO.builder()
-                        .commentId(comment.getCommentId())
-                        .content(comment.getContent())
-                        .commentDate(comment.getCreatedAt().toString())
-                        .userId(comment.getUser().getUserId())
-                        .profileUrl(comment.getUser().getProfileImage() != null ?
-                                comment.getUser().getProfileImage().getProfileURL() : "null")                        .build())
+                .map(comment -> {
+                    String profileUrl = comment.getUser().getProfileImage() != null ?
+                            comment.getUser().getProfileImage().getProfileURL() : "null";
+
+                    return CommentResponseDTO.builder()
+                            .commentId(comment.getCommentId())
+                            .content(comment.getContent())
+                            .commentDate(comment.getCreatedAt().toString())
+                            .userId(comment.getUser().getUserId())
+                            .profileUrl(profileUrl)
+                            .build();
+                })
                 .toList();
     }
 
