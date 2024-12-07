@@ -16,13 +16,13 @@ public interface PostService {
     void updatePost(Long postId, PostRequestDTO postRequestDTO, List<MultipartFile> files, String token);
 
     //New Post 반환
-    List<PostResponseDTO> getNewPost(String token);
+    PostResponseDTO getNewPost(String token);
 
     //인기 게시물 가져오기
-    List<PostResponseDTO> getPopular(String token);
+    PostResponseDTO getPopular(String token);
 
     //게시물 상세보기
-    List<PostResponseDTO> getDetail(Long postId,String token);
+    PostResponseDTO getDetail(Long postId,String token);
 
     //게시물 삭제
     String deletePost(Long postId,String userId);

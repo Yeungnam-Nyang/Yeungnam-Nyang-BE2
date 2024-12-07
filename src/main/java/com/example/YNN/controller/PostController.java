@@ -106,10 +106,10 @@ public class PostController {
                     .body("유효하지 않은 토큰입니다.");
         }
         try {
-            List<PostResponseDTO> postResponseDTO = postService.getNewPost(token);
+            PostResponseDTO postResponseDTO = postService.getNewPost(token);
             return ResponseEntity.ok(postResponseDTO);
         } catch (Exception e) {
-            List<PostResponseDTO> emptyResponse = Collections.emptyList();
+            PostResponseDTO emptyResponse = new PostResponseDTO();
             return ResponseEntity.badRequest().body(emptyResponse);
         }
     }
@@ -131,10 +131,10 @@ public class PostController {
                     .body("유효하지 않은 토큰입니다.");
         }
         try {
-            List<PostResponseDTO> postResponseDTO = postService.getPopular(token);
+            PostResponseDTO postResponseDTO = postService.getPopular(token);
             return ResponseEntity.ok(postResponseDTO);
         } catch (Exception e) {
-            List<PostResponseDTO> emptyResponse = Collections.emptyList();
+            PostResponseDTO emptyResponse = new PostResponseDTO();
             return ResponseEntity.badRequest().body(emptyResponse);
         }
     }
@@ -210,10 +210,10 @@ public class PostController {
             );
         }
         try{
-           List<PostResponseDTO> postResponseDTO = postService.getDetail(postId,token);
+            PostResponseDTO postResponseDTO = postService.getDetail(postId,token);
            return ResponseEntity.ok().body(postResponseDTO);
         }catch (Exception e){
-            List<PostResponseDTO> emptyResponseDTO = Collections.emptyList();
+            PostResponseDTO emptyResponseDTO = new PostResponseDTO();
             return ResponseEntity.badRequest().body(emptyResponseDTO);
         }
     }

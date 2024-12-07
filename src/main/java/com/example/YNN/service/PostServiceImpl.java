@@ -148,11 +148,13 @@ public class PostServiceImpl implements PostService{
 
     //최신 게시물 불러오기
     @Override
-    public List<PostResponseDTO> getNewPost(String token) {
+    public PostResponseDTO getNewPost(String token) {
         List<Post> postList = postRepository.findAllByOrderByCreatedAtDesc();
-        // 게시물이 없는 경우 빈 리스트 반환
+        // 게시물이 없는 경우 null DTO 반환
         if (postList.isEmpty()) {
-            return Collections.emptyList();
+            return PostResponseDTO.builder()
+                    .message("null")
+                    .build();
         }
         // 사용자 정보 가져오기
         String userId = jwtUtil.getUserId(token);
@@ -188,16 +190,18 @@ public class PostServiceImpl implements PostService{
                 .likedByUser(likedByUser)
                 .build();
         // 단일 DTO를 리스트로 감싸 반환
-        return List.of(postResponseDTO);
+        return postResponseDTO;
     }
 
     //인기 게시물 가져오기
     @Override
-    public List<PostResponseDTO> getPopular(String token) {
+    public PostResponseDTO getPopular(String token) {
         List<Post> postList=postRepository.findAllByOrderByLikeCntDesc();
-        // 게시물이 없는 경우 빈 리스트 반환
+        // 게시물이 없는 경우 null DTO 반환
         if (postList.isEmpty()) {
-            return Collections.emptyList();
+            return PostResponseDTO.builder()
+                    .message("null")
+                    .build();
         }
         // 사용자 정보 가져오기
         String userId = jwtUtil.getUserId(token);
@@ -235,14 +239,13 @@ public class PostServiceImpl implements PostService{
                 .build();
 
         //제이슨 형식 DTO리턴
-        return List.of(postResponseDTO);
+        return postResponseDTO;
 
     }
 
     // 게시물 상세보기
     @Override
-
-    public List<PostResponseDTO> getDetail(Long postId,String token) {
+    public PostResponseDTO getDetail(Long postId,String token) {
         Post findPost=postRepository.findByPostId(postId);
         // 사용자 정보 가져오기
         String userId = jwtUtil.getUserId(token);
@@ -281,7 +284,7 @@ public class PostServiceImpl implements PostService{
                 //댓글은 보류
                 .build();
 
-        return List.of(postResponseDTO);
+        return postResponseDTO;
     }
 
     @Override
