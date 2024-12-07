@@ -34,15 +34,13 @@ public class UserServiceImpl implements UserService {
     public UserProfileDTO getUserProfile(String userId) {
         User user = userRepository.findByUserId(userId);
         Profile profile = profileRepository.findByUser(user).orElse(null);
-        // 기본 프로필 이미지 URL : 내 S3 버킷의 /test 디렉토리에 세팅해둠.
-        String defaultProfileUrl = "https://ynn-server-bucket0425.s3.ap-northeast-2.amazonaws.com/test/free-icon-profile-7263996.png";
 
         return UserProfileDTO.builder()
                 .userId(user.getUserId())
                 .studentName(user.getStudent().getStudentName())
                 .schoolName(user.getStudent().getSchoolName())
                 .departmentName(user.getStudent().getDepartmentName())
-                .profileURL(profile != null ? profile.getProfileURL() : defaultProfileUrl) // 기본 프로필 URL 사용
+                .profileURL(profile != null ? profile.getProfileURL() : "null") // 기본 프로필 URL 사용
                 .build();
     }
 
