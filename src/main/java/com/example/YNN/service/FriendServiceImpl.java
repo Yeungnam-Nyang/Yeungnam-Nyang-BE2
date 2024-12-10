@@ -153,16 +153,17 @@ public class FriendServiceImpl implements FriendService {
         if (user == null) {
             throw new CustomException(ErrorCode.NOT_EXITS_USER, ErrorCode.NOT_EXITS_USER.getMessage()); // 예외 처리
         }
-        // ACCEPTED 상태인 친구만 조회
-        List<Friend> friends = friendRepository.findByUser_UserIdAndStatus(userId, FriendRequestStatus.ACCEPTED);
+        // 양방향으로 ACCEPTED인 친구 목록 조회
+        List<Friend> friends = friendRepository.findFriendsByUserIdAndStatus(userId, FriendRequestStatus.ACCEPTED);
 
         return friends.stream()
                 .map(friend -> {
-                    String profileURL = getUserProfileUrl(friend.getUser().getUserId());
+                    String otherUserId = friend.getUser().getUserId().equals(userId) ? friend.getFriendId() : friend.getUser().getUserId();
+                    String profileURL = getUserProfileUrl(otherUserId);
                     return new FriendResponseDTO(
                             "친구 상태: " + friend.getStatus().toString(),
                             friend.getStatus(),
-                            friend.getFriendId(),
+                            otherUserId,
                             profileURL
                     );
                 })
