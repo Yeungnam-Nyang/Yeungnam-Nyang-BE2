@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         /* JWT토큰 없이 접근 가능 */
-                        .requestMatchers( "/api/signup/**","/api/send/new-password","/api/find/id","/api/login","/api/sms/**", "/api/friend/**")
+                        .requestMatchers( "/api/signup/**","/api/send/new-password","/api/find/id","/api/login","/api/sms/**", "/api/friend/**", "/https")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
