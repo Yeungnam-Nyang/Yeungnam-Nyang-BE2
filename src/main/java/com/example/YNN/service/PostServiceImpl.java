@@ -53,6 +53,7 @@ public class PostServiceImpl implements PostService{
                 .createdAt(LocalDateTime.now())
                 .catStopWatch(LocalDateTime.now())
                 .likeCnt(0L)
+                .catFoodCnt(0)
                 .commentCnt(0L)
                 .build();
         postRepository.save(post);
@@ -278,6 +279,7 @@ public class PostServiceImpl implements PostService{
                 .likeCnt(findPost.getLikeCnt())
                 .userId(findPost.getUser().getUserId())
                 .catName(findPost.getCatName())
+                .catFoodCnt(findPost.getCatFoodCnt())
                 .catStopWatch(String.valueOf(findPost.getCatStopWatch()))
                 .address(address)
                 .likedByUser(likedByUser)
