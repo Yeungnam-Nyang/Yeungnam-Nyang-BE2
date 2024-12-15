@@ -1,11 +1,9 @@
 package com.example.YNN.model;
 
 
-import com.example.YNN.util.EmojiConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -36,11 +34,11 @@ public class Comment {
     @NotNull
     private String content; // 댓글
 
-    @CreationTimestamp // JPA로 자동으로 시간 설정한 게 DB에 들어가게끔
+    @CreatedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd/HH:mm:ss")
     private LocalDateTime createdAt; // 댓글 생성 날짜
 
-    @CreationTimestamp // JPA로 자동으로 시간 설정한 게 DB에 들어가게끔
+    @CreatedDate
     @DateTimeFormat(pattern = "yyyy-MM-dd/HH:mm:ss")
     private LocalDateTime updatedAt; // 댓글 수정 날짜
 }
