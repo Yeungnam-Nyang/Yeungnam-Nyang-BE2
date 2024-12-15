@@ -50,6 +50,7 @@ public class CommentServiceImpl implements CommentService {
                     .content(commentRequestDTO.getContent())
                     .post(post)
                     .user(user)
+                    .createdAt(LocalDateTime.now())
                     .build();
             commentRepository.save(comment);
         } catch (Exception e) {

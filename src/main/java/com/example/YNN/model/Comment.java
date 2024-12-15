@@ -4,6 +4,7 @@ package com.example.YNN.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -34,11 +35,11 @@ public class Comment {
     @NotNull
     private String content; // 댓글
 
-    @CreatedDate
+    @CreationTimestamp
     @DateTimeFormat(pattern = "yyyy-MM-dd/HH:mm:ss")
     private LocalDateTime createdAt; // 댓글 생성 날짜
 
-    @CreatedDate
+    @CreationTimestamp
     @DateTimeFormat(pattern = "yyyy-MM-dd/HH:mm:ss")
     private LocalDateTime updatedAt; // 댓글 수정 날짜
 }
