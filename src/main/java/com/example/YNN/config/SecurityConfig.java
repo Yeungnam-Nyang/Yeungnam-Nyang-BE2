@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         /* JWT토큰 없이 접근 가능 */
-                        .requestMatchers( "/api/signup/**","/api/send/new-password","/api/find/id","/api/login","/api/sms/**", "/api/friend/**")
+                        .requestMatchers( "/api/signup/**","/api/send/new-password","/api/find/id","/api/login","/api/sms/**", "/api/friend/**", "/https")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
@@ -64,7 +64,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5173","http://localhost:5173", "http://43.202.47.254:8080","https://yeungnam-nyang.site","http://yeungnam-nyang.site.s3-website-us-east-1.amazonaws.com")); // 명시적으로 허용할 출처
+        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5173","http://localhost:5173", "http://43.202.47.254:8080","http://yeungnam-nyang.site","https://yeungnam-nyang.site","http://yeungnam-nyang.site.s3-website-us-east-1.amazonaws.com")); // 명시적으로 허용할 출처
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // 자격 증명 허용
