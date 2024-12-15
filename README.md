@@ -15,8 +15,10 @@
 
 ## 💻 YNN Service Architecture
 
-![영남냥 drawio](https://github.com/user-attachments/assets/a580f54e-1d17-4bde-a0ff-c864e21c982f)
+![영남냥-아키텍쳐1 drawio](https://github.com/user-attachments/assets/3179c065-250e-4c6a-97e2-835e3432bba0)
+
 
 ## 📔 YNN ERD Diagram
 
 ![Copy of yu-cat](https://github.com/user-attachments/assets/dcc62775-aa6a-44da-82a0-aaa1d8045f9f)
+
